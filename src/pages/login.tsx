@@ -11,11 +11,11 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type z } from "zod";
 import {
+  AuthLayout,
   handleGoogleSignIn,
   handleSignIn,
   loginValidationSchema,
-} from "~/components/auth/utils";
-import { AuthLayout } from "~/components/authLayout";
+} from "~/components/auth";
 
 type LoginValidationSchema = z.infer<typeof loginValidationSchema>;
 

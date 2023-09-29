@@ -11,10 +11,10 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type z } from "zod";
 import {
+  AuthLayout,
   handleSignIn,
   registerValidationSchema,
-} from "~/components/auth/utils";
-import { AuthLayout } from "~/components/authLayout";
+} from "~/components/auth";
 import { api } from "~/utils/api";
 
 type RegisterValidationSchema = z.infer<typeof registerValidationSchema>;
