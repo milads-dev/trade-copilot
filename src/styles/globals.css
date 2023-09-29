@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer components {
+.auth_input {
+    @apply input input-bordered w-full pr-14  focus:input-accent
+}
+
+.auth_input_error {
+    @apply mt-2 text-xs italic text-error
+}
+}
