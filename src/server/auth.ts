@@ -1,11 +1,14 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
 import {
-  getServerSession,
-  type NextAuthOptions,
   type DefaultSession,
+  type NextAuthOptions,
+  getServerSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { compareSync } from "bcryptjs";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
@@ -36,20 +39,55 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+  session: {
+    strategy: "jwt",
+  },
+  debug: true,
   callbacks: {
-    session: ({ session, user }) => ({
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.sub,
       },
     }),
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    CredentialsProvider({
+      name: "Sign In",
+      credentials: {
+        email: { label: "Email", type: "text", value: "milad@gmail.com" },
+        password: { label: "Password", type: "text", value: "123456" },
+      },
+      async authorize(credentials, req) {
+        // You need to provide your own logic here that takes the credentials
+        // submitted and returns either a object representing a user or value
+        // that is false/null if the credentials are invalid.
+        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+        // You can also use the `req` object to obtain additional parameters
+        // (i.e., the request IP address)
+        if (!credentials?.email || !credentials.password) return null;
+        // const res = await fetch("/your/endpoint", {
+        //   method: 'POST',
+        //   body: JSON.stringify(credentials),
+        //   headers: { "Content-Type": "application/json" }
+        // })
+        // const user = await res.json()
+        const dbUser = await prisma.user.findFirst({
+          where: { email: credentials.email },
+        });
+
+        if (dbUser && compareSync(credentials.password, dbUser.password!)) {
+          return dbUser;
+        }
+
+        return null;
+      },
+    }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     /**
      * ...add more providers here.
