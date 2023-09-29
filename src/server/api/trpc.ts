@@ -6,6 +6,14 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
+import { type Session } from "next-auth";
+
+/**
+ * 2. INITIALIZATION
+ *
+ * This is where the tRPC API is initialized, connecting the context and transformer.
+ */
+import { TRPCError, initTRPC } from "@trpc/server";
 
 /**
  * 1. CONTEXT
@@ -15,7 +23,9 @@
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-
+import superjson from "superjson";
+// import { getAuth } from "@clerk/nextjs/server";
+import { ZodError } from "zod";
 import { prisma } from "~/server/db";
 
 /**
@@ -35,16 +45,6 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
     // userId,
   };
 };
-
-/**
- * 2. INITIALIZATION
- *
- * This is where the tRPC API is initialized, connecting the context and transformer.
- */
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-// import { getAuth } from "@clerk/nextjs/server";
-import { ZodError } from "zod";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
