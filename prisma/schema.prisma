@@ -72,4 +72,7 @@ model TradeHistory {
   Volume    Float    
   Price     Float    
   Profit    Float    
+
+    @@unique([Symbol, TimeStamp, userId, Volume, Price, Profit])
+
 }
