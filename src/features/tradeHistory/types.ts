@@ -29,3 +29,5 @@ export const generalCsvSchema = z.union([metaTraderCsvSchema, ibkrCsvSchema]);
 export const arrayCsvSchema = z.array(generalCsvSchema);
 
 export const dataBaseTradeArraySchema = z.array(dataBaseTradeSchema);
+
+export type dataBaseTradeArrayType = z.infer<typeof dataBaseTradeArraySchema>;
