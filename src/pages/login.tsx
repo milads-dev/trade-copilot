@@ -8,14 +8,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type z } from "zod";
 import {
   AuthLayout,
   handleGoogleSignIn,
   handleSignIn,
   loginValidationSchema,
 } from "~/components/auth";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { type z } from "zod";
 
 type LoginValidationSchema = z.infer<typeof loginValidationSchema>;
 

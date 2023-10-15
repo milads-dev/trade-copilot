@@ -1,7 +1,6 @@
 module.exports = {
-  plugins: [require.resolve("prettier-plugin-tailwindcss"),require.resolve("@trivago/prettier-plugin-sort-imports")],
-  "importOrder": ["^react(.*)", "^next(.*)", "<THIRD_PARTY_MODULES>", "@/(.*)", "^[./]"],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  importOrderSeparation: true,
+  importOrderSortSpecifiers: true,
+  plugins: ["@trivago/prettier-plugin-sort-imports" ,'prettier-plugin-tailwindcss'],
+  importOrder: ["^react(.*)", "^next(.*)", "<THIRD_PARTY_MODULES>", '^@', '^[a-zA-Z0-9-]+', '^[./]'],
 }
-
