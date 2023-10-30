@@ -27,6 +27,7 @@
     "next": "^13.4.2",
     "next-auth": "^4.22.4",
     "react": "18.2.0",
+    "react-calendar": "^4.6.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.46.1",
     "react-papaparse": "^4.1.0",

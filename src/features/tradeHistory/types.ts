@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const DateRangeSchema = z.tuple([
+  z.date().or(z.null()),
+  z.date().or(z.null()),
+]);
+export type DateRangeType = z.infer<typeof DateRangeSchema>;
+
 const baseTradeSchema = z.object({
   Symbol: z.string(),
   Price: z.number(),
