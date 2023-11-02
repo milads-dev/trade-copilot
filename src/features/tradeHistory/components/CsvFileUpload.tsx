@@ -14,8 +14,13 @@ interface CsvObject {
 export const CsvFileUpload = () => {
   /* eslint-disable @typescript-eslint/no-unsafe-assignment */
   const { CSVReader } = useCSVReader();
+  const ctx = api.useContext();
 
-  const mutation = api.trades.addTrades.useMutation();
+  const mutation = api.trades.addTrades.useMutation({
+    onSuccess: () => {
+      void ctx.trades.invalidate();
+    },
+  });
 
   const handleOnDrop = (input: CsvObject) => {
     const { data, error } = input;
@@ -54,7 +59,7 @@ export const CsvFileUpload = () => {
       any) => (
         <div>
           {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
-          <button className="btn btn-outline btn-primary" {...getRootProps()}>
+          <button className="btn btn-primary btn-outline" {...getRootProps()}>
             <span>Import CSV</span>
             {mutation.isLoading ? (
               <span className="loading loading-dots loading-md"></span>

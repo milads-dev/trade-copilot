@@ -5,6 +5,8 @@ import { type AppType } from "next/app";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
+import "../styles/calendar.css";
+
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
