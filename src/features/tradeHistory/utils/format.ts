@@ -56,7 +56,9 @@ type DailyTrade = {
 };
 
 export const processDailyTrades = (trades: dataBaseTradeArrayType) => {
-  return trades.reduce<DailyTrade[]>((dailyTrades, currentTrade) => {
+  const sortedTrades = sortTradesByDayAndSymbol(trades);
+
+  return sortedTrades.reduce<DailyTrade[]>((dailyTrades, currentTrade) => {
     const { Symbol, Profit, TimeStamp } = currentTrade;
     const lastTrade = dailyTrades[dailyTrades.length - 1];
 
@@ -84,4 +86,19 @@ export const processDailyTrades = (trades: dataBaseTradeArrayType) => {
 
 export const formatUtcTimestamp = (utcTimestamp: Date) => {
   return moment.utc(utcTimestamp).format("YYYY-MM-DD HH:mm:ss");
+};
+
+const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {
+  return trades.sort((a, b) => {
+    const aDate = moment(a.TimeStamp);
+    const bDate = moment(b.TimeStamp);
+
+    if (aDate.isSame(bDate, "month")) {
+      return aDate.isSame(bDate, "day")
+        ? a.Symbol.localeCompare(b.Symbol)
+        : aDate.date() - bDate.date();
+    }
+
+    return aDate.month() - bDate.month();
+  });
 };
