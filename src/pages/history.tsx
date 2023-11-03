@@ -1,0 +1,112 @@
+import { useState } from "react";
+import "react-calendar/dist/Calendar.css";
+
+import { type GetServerSidePropsContext } from "next";
+import { getSession, signOut } from "next-auth/react";
+import Head from "next/head";
+import Image from "next/image";
+
+import {
+  CsvFileUpload,
+  DateRangeSchema,
+  type DateRangeType,
+} from "~/features/tradeHistory";
+import { DateRangeButton } from "~/features/tradeHistory/components/DateRangeButton";
+import { TradeTable } from "~/features/tradeHistory/components/TradeTable";
+import { api } from "~/utils/api";
+
+const History = () => {
+  const [dateRange, setDateRange] = useState<DateRangeType>([null, null]);
+
+  const { data, isLoading, fetchNextPage } =
+    api.trades.getTrades.useInfiniteQuery(
+      { dateRange },
+      {
+        getNextPageParam: (lastPage) => lastPage?.nextCursor,
+        refetchOnWindowFocus: false,
+      }
+    );
+
+  const handleNextTrades = async () => {
+    await fetchNextPage();
+  };
+
+  const handleDateChange = (dates: unknown) => {
+    setDateRange(DateRangeSchema.parse(dates));
+  };
+
+  const trades = data?.pages.flatMap((page) => page?.trades ?? []);
+
+  return (
+    <>
+      <Head>
+        <title>Trade History</title>
+        <meta name="description" content="The Trade History Page" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main className="flex min-h-screen flex-col p-10">
+        <div className="mb-5 flex justify-between">
+          <button className="btn btn-outline" onClick={() => void signOut()}>
+            Sign Out
+          </button>
+
+          <CsvFileUpload />
+        </div>
+
+        <div className="relative mt-9 self-end">
+          <DateRangeButton passDateChange={handleDateChange} />
+        </div>
+
+        <div className="mx-auto h-[48rem] w-full overflow-x-auto">
+          {isLoading && (
+            <div className="flex h-[80vh] flex-col items-center justify-center space-y-5">
+              <Image
+                src="/assets/searchingClouds.svg"
+                alt="Searching"
+                layout="fixed"
+                width={400}
+                height={100}
+              />
+              <div className="animate-pulse text-white">
+                {isLoading ? "Loading..." : "No Trades Found"}
+              </div>
+            </div>
+          )}
+          {trades?.length ?? 0 > 0 ? (
+            <TradeTable trades={trades} handleNextTrades={handleNextTrades} />
+          ) : (
+            <div className="flex h-2/3 flex-col items-center justify-center space-y-8">
+              <Image
+                src="/assets/not-found.svg"
+                alt="No Data"
+                layout="fixed"
+                width={400}
+                height={100}
+              />
+              <span>No Trades Found</span>
+            </div>
+          )}
+        </div>
+      </main>
+    </>
+  );
+};
+
+export default History;
+
+export async function getServerSideProps({ req }: GetServerSidePropsContext) {
+  const session = await getSession({ req });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+}

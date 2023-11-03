@@ -1,7 +1,9 @@
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
 import { TRPCError } from "@trpc/server";
+
 import { hashSync } from "bcryptjs";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 const encryptPassword = (password: string): string => {
   const saltRounds = 10;

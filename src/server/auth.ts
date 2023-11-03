@@ -7,10 +7,12 @@ import {
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { compareSync } from "bcryptjs";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
+import { compareSync } from "bcryptjs";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

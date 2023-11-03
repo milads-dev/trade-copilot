@@ -50,6 +50,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     password      String?
+    tradeLogs     TradeHistory[]
 }
 
 model VerificationToken {
@@ -58,4 +59,20 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model TradeHistory {
+  id        Int      @id @default(autoincrement())
+  Symbol    String
+  TimeStamp DateTime
+  userId    String      
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  Volume    Float    
+  Price     Float    
+  Profit    Float    
+
+    @@unique([Symbol, TimeStamp, userId, Volume, Price, Profit])
+
 }
