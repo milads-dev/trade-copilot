@@ -59,7 +59,7 @@ export const CsvFileUpload = () => {
       any) => (
         <div>
           {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
-          <button className="btn btn-primary btn-outline" {...getRootProps()}>
+          <button className="btn btn-primary" {...getRootProps()}>
             <span>Import CSV</span>
             {mutation.isLoading ? (
               <span className="loading loading-dots loading-md"></span>
