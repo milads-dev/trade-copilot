@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "react-calendar/dist/Calendar.css";
 
+import { useRouter } from "next/router";
+
 import { CalendarComponent } from "~/components/CalendarComponent";
 
 import { DateRangeSchema, type DateRangeType } from "../types";
@@ -10,7 +12,16 @@ interface Props {
 }
 
 export const DateRangeButton = ({ passDateChange }: Props) => {
-  const [dateRange, setDateRange] = useState<DateRangeType>([null, null]);
+  const router = useRouter();
+  const startDate = router.query.from as string | undefined;
+  const endDate = router.query.to as string | undefined;
+  const initialStartDate = startDate ? new Date(startDate) : null;
+  const initialEndDate = endDate ? new Date(endDate) : null;
+
+  const [dateRange, setDateRange] = useState<DateRangeType>([
+    initialStartDate,
+    initialEndDate,
+  ]);
   const [calendarVisible, setCalendarVisible] = useState(false);
 
   const handleDateChange = (dates: unknown) => {

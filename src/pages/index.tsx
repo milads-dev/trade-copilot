@@ -21,7 +21,7 @@ export default function Home() {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center space-y-5">
         <button className="btn btn-primary">
-          <Link href="/history">History </Link>
+          <Link href="/trades">Trade History </Link>
         </button>
         <AuthShowcase />
       </main>

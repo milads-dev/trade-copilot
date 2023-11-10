@@ -102,3 +102,12 @@ const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {
     return aDate.month() - bDate.month();
   });
 };
+
+export const getDateRangeTimestamps = (startDate: string, endDate: string) => {
+  const timeStampStart = moment(startDate, "MM/DD/YYYY")
+    .startOf("day")
+    .format();
+  const timeStampEnd = moment(endDate, "MM/DD/YYYY").endOf("day").format();
+
+  return { timeStampStart, timeStampEnd };
+};

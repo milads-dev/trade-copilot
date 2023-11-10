@@ -1,9 +1,9 @@
 import {
-  DateRangeSchema,
   dataBaseTradeArraySchema,
   type dataBaseTradeArrayType,
   fetchTradeCount,
   formatUtcTimestamp,
+  getDateRangeTimestamps,
   processDailyTrades,
 } from "~/features/tradeHistory";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -35,29 +35,31 @@ export const tradesRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        dateRange: DateRangeSchema,
+        startDate: z.string().nullish(),
+        endDate: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { cursor, dateRange } = input;
+      const { cursor, startDate, endDate } = input;
+
       const userId = ctx.session.user.id;
 
       try {
         let response;
         let nextCursor: typeof cursor | undefined = undefined;
 
-        if (
-          dateRange !== undefined &&
-          dateRange.every((item) => item instanceof Date)
-        ) {
-          const [startDate, endDate] = dateRange;
+        if (typeof startDate === "string" && typeof endDate === "string") {
+          const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
+            startDate,
+            endDate
+          );
 
           response = await ctx.prisma.tradeHistory.findMany({
             where: {
               userId: ctx.session.user.id,
               TimeStamp: {
-                gte: new Date(startDate!),
-                lte: new Date(endDate!),
+                gte: timeStampStart,
+                lte: timeStampEnd,
               },
             },
             orderBy: {

@@ -1,26 +1,28 @@
-import { useState } from "react";
 import "react-calendar/dist/Calendar.css";
 
 import { type GetServerSidePropsContext } from "next";
 import { getSession, signOut } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import {
   CsvFileUpload,
   DateRangeSchema,
-  type DateRangeType,
+  generateDateRangeUrl,
 } from "~/features/tradeHistory";
 import { DateRangeButton } from "~/features/tradeHistory/components/DateRangeButton";
 import { TradeTable } from "~/features/tradeHistory/components/TradeTable";
 import { api } from "~/utils/api";
 
-const History = () => {
-  const [dateRange, setDateRange] = useState<DateRangeType>([null, null]);
+const Trades = () => {
+  const router = useRouter();
+  const startDate = router.query.from as string;
+  const endDate = router.query.to as string;
 
   const { data, isLoading, fetchNextPage } =
     api.trades.getTrades.useInfiniteQuery(
-      { dateRange },
+      { startDate, endDate },
       {
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
         refetchOnWindowFocus: false,
@@ -32,7 +34,12 @@ const History = () => {
   };
 
   const handleDateChange = (dates: unknown) => {
-    setDateRange(DateRangeSchema.parse(dates));
+    const currentUrl = router.pathname;
+    const [start, end] = DateRangeSchema.parse(dates);
+
+    const newUrl = generateDateRangeUrl(currentUrl, start, end);
+
+    void router.replace(newUrl, undefined, { shallow: true });
   };
 
   const trades = data?.pages.flatMap((page) => page?.trades ?? []);
@@ -92,7 +99,7 @@ const History = () => {
   );
 };
 
-export default History;
+export default Trades;
 
 export async function getServerSideProps({ req }: GetServerSidePropsContext) {
   const session = await getSession({ req });
