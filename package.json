@@ -23,6 +23,7 @@
     "@types/bcryptjs": "^2.4.4",
     "@types/papaparse": "^5.3.9",
     "bcryptjs": "^2.4.3",
+    "lightweight-charts": "^4.1.1",
     "moment": "^2.29.4",
     "next": "^13.4.2",
     "next-auth": "^4.22.4",
