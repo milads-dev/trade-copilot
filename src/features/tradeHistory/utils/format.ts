@@ -84,8 +84,18 @@ export const processDailyTrades = (trades: dataBaseTradeArrayType) => {
   }, []);
 };
 
-export const formatUtcTimestamp = (utcTimestamp: Date) => {
-  return moment.utc(utcTimestamp).format("YYYY-MM-DD HH:mm:ss");
+export const formatUtcTimestamp = (timestamp: string | Date) => {
+  let utcTimestamp: Date;
+
+  if (typeof timestamp === "string") {
+    utcTimestamp = new Date(timestamp);
+    return moment.utc(utcTimestamp).format("MM/DD/YYYY h:mm:ss");
+  } else if (timestamp instanceof Date) {
+    utcTimestamp = timestamp;
+    return moment.utc(utcTimestamp).format("YYYY-MM-DD HH:mm:ss");
+  } else {
+    throw new Error("Invalid timestamp type");
+  }
 };
 
 const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {

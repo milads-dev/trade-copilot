@@ -1,3 +1,10 @@
+import { candleStickSchema } from "~/features/tradeDetails/type";
+import {
+  formatToUnix,
+  getMarketTimes,
+  getSymbol,
+  timeToLocal,
+} from "~/features/tradeDetails/utils";
 import {
   dataBaseTradeArraySchema,
   type dataBaseTradeArrayType,
@@ -135,13 +142,53 @@ export const tradesRouter = createTRPCRouter({
         `;
         const formatedTrades = result.map((trades) => ({
           ...trades,
-          TimeStamp: formatUtcTimestamp(new Date(trades.TimeStamp)),
+          Marker: formatToUnix(trades.TimeStamp),
         }));
 
         return { dailyTrades: formatedTrades };
       } catch (error) {
         console.error("Error retrieving trades:", error);
         return { dailyTrades: [] };
+      }
+    }),
+  getTradeDetails: protectedProcedure
+    .input(
+      z.object({
+        symbol: z.string(),
+        date: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { symbol, date } = input;
+
+      const { validSymbol } = getSymbol(symbol);
+
+      const { marketOpen, marketClose } = getMarketTimes(date);
+
+      try {
+        const data: unknown = await (
+          await fetch(
+            `https://finnhub.io/api/v1/stock/candle?symbol=${validSymbol}&resolution=1&from=${marketOpen}&to=${marketClose}&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
+          )
+        ).json();
+        const result = candleStickSchema.parse(data);
+
+        const formatResponse = result.t.map(
+          (unixTime: number, index: number) => {
+            return {
+              time: timeToLocal(unixTime),
+              open: result.o[index],
+              high: result.h[index],
+              low: result.l[index],
+              close: result.c[index],
+              volume: result.v[index],
+            };
+          }
+        );
+        return { data: formatResponse };
+      } catch (error) {
+        console.error("Error retrieving candles:", error);
+        return { data: [] };
       }
     }),
 });
