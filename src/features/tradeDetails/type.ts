@@ -2,13 +2,16 @@ import { type Time } from "lightweight-charts";
 import { z } from "zod";
 
 export const candleStickSchema = z.object({
-  c: z.array(z.number()),
-  h: z.array(z.number()),
-  l: z.array(z.number()),
-  o: z.array(z.number()),
-  s: z.string(),
-  t: z.array(z.number()),
-  v: z.array(z.number()),
+  values: z.array(
+    z.object({
+      datetime: z.string(),
+      open: z.string(),
+      high: z.string(),
+      low: z.string(),
+      close: z.string(),
+      volume: z.string(),
+    })
+  ),
 });
 
 export interface CandlestickData {

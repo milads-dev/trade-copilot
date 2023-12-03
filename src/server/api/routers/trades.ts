@@ -163,28 +163,28 @@ export const tradesRouter = createTRPCRouter({
 
       const { validSymbol } = getSymbol(symbol);
 
-      const { marketOpen, marketClose } = getMarketTimes(date);
-
       try {
         const data: unknown = await (
           await fetch(
-            `https://finnhub.io/api/v1/stock/candle?symbol=${validSymbol}&resolution=1&from=${marketOpen}&to=${marketClose}&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`
+            `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=1min&symbol=${validSymbol}&dp=2&start_date=${date} 9:30:00&end_date=${date} 16:00:00`
           )
         ).json();
+
         const result = candleStickSchema.parse(data);
 
-        const formatResponse = result.t.map(
-          (unixTime: number, index: number) => {
+        const formatResponse = result.values
+          .reverse()
+          .map(({ datetime, open, high, low, close, volume }) => {
             return {
-              time: timeToLocal(unixTime),
-              open: result.o[index],
-              high: result.h[index],
-              low: result.l[index],
-              close: result.c[index],
-              volume: result.v[index],
+              time: timeToLocal(datetime),
+              open: parseFloat(open),
+              high: parseFloat(high),
+              low: parseFloat(low),
+              close: parseFloat(close),
+              volume: parseFloat(volume),
             };
-          }
-        );
+          });
+
         return { data: formatResponse };
       } catch (error) {
         console.error("Error retrieving candles:", error);

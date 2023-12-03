@@ -29,8 +29,8 @@ export const getMarketTimes = (date: string) => {
   return { marketOpen, marketClose };
 };
 
-export const timeToLocal = (originalTime: number) => {
-  const utcDate = new Date(originalTime * MILLISECONDS);
+export const timeToLocal = (originalTime: string) => {
+  const utcDate = new Date(originalTime);
   return (Date.UTC(
     utcDate.getFullYear(),
     utcDate.getMonth(),

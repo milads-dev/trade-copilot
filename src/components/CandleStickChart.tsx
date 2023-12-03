@@ -17,6 +17,8 @@ export const CandleStickChart = () => {
     { symbol, date },
     {
       refetchOnWindowFocus: false,
+      staleTime: 20 * (60 * 1000),
+      cacheTime: 25 * (60 * 1000),
     }
   );
   const { data } = api.trades.getTradesByDate.useQuery(
