@@ -2,9 +2,9 @@ type SymbolMapping = Record<string, string>;
 
 export const getSymbol = (symbol: string) => {
   const symbolMapping: SymbolMapping = {
-    us100: "QQQ",
-    us500: "SPY",
-    us30: "DIA",
+    US100: "QQQ",
+    US500: "SPY",
+    US30: "DIA",
   };
 
   let filteredSymbol = symbol.split(".")[0]?.toUpperCase();

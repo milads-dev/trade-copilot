@@ -20,12 +20,15 @@ type Context = {
 export const fetchTradeCount = async (
   ctx: Context,
   userId: string,
-  cursor: number | null | undefined
+  cursor: Date | null | undefined
 ) => {
   const initialTrade = await ctx.prisma.tradeHistory.findFirst({
     where: {
       userId,
-      ...(cursor ? { id: cursor } : {}),
+      ...(cursor ? { TimeStamp: cursor } : {}),
+    },
+    orderBy: {
+      TimeStamp: "asc",
     },
   });
 

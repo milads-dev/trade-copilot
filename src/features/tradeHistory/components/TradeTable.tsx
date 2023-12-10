@@ -36,6 +36,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
         container.removeEventListener("scroll", handleScroll);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

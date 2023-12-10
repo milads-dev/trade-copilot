@@ -1,7 +1,6 @@
 import { candleStickSchema } from "~/features/tradeDetails/type";
 import {
   formatToUnix,
-  getMarketTimes,
   getSymbol,
   timeToLocal,
 } from "~/features/tradeDetails/utils";
@@ -41,7 +40,12 @@ export const tradesRouter = createTRPCRouter({
   getTrades: protectedProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z
+          .object({
+            id: z.number().nullish(),
+            date: z.date().nullish(),
+          })
+          .nullish(),
         startDate: z.string().nullish(),
         endDate: z.string().nullish(),
       })
@@ -74,7 +78,11 @@ export const tradesRouter = createTRPCRouter({
             },
           });
         } else {
-          const weeklyTradeCount = await fetchTradeCount(ctx, userId, cursor);
+          const weeklyTradeCount = await fetchTradeCount(
+            ctx,
+            userId,
+            cursor?.date
+          );
 
           const lastTradeId = await ctx.prisma.tradeHistory.findFirst({
             select: {
@@ -87,7 +95,12 @@ export const tradesRouter = createTRPCRouter({
 
           response = await ctx.prisma.tradeHistory.findMany({
             take: weeklyTradeCount + 1,
-            cursor: cursor ? { id: cursor } : undefined,
+            cursor: cursor
+              ? {
+                  TimeStamp: cursor.date ?? undefined,
+                  id: cursor.id ?? undefined,
+                }
+              : undefined,
             where: {
               userId: ctx.session.user.id,
             },
@@ -99,10 +112,13 @@ export const tradesRouter = createTRPCRouter({
           const nextTradeId =
             response[weeklyTradeCount - 1]?.id ?? weeklyTradeCount;
 
-          if (lastTradeId!.id > nextTradeId) {
+          if (lastTradeId!.id !== nextTradeId) {
             const nextTrade = response.pop();
 
-            nextCursor = nextTrade?.id;
+            nextCursor = {
+              id: nextTrade?.id,
+              date: nextTrade?.TimeStamp,
+            };
           }
         }
 
