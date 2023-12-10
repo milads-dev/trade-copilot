@@ -87,9 +87,9 @@ export const CandleStickChart = () => {
         ref={chartRef}
         style={{ backgroundColor: "#624b4b" }}
       ></div>
-      {isLoading && (
+      {isLoading ? (
         <span className="loading loading-infinity loading-lg absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform text-success"></span>
-      )}
+      ) : null}
       {!dailyTrades ||
         (dailyTrades.length === 0 && (
           <div>

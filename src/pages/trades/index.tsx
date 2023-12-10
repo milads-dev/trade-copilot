@@ -65,7 +65,7 @@ const Trades = () => {
         </div>
 
         <div className="mx-auto h-[48rem] w-full overflow-x-auto">
-          {isLoading && (
+          {isLoading ? (
             <div className="flex h-[80vh] flex-col items-center justify-center space-y-5">
               <Image
                 src="/assets/searchingClouds.svg"
@@ -78,7 +78,7 @@ const Trades = () => {
                 {isLoading ? "Loading..." : "No Trades Found"}
               </div>
             </div>
-          )}
+          ) : null}
           {trades?.length ?? 0 > 0 ? (
             <TradeTable trades={trades} handleNextTrades={handleNextTrades} />
           ) : (
