@@ -1,3 +1,5 @@
+import type { RouterOutputs } from "~/utils/api";
+
 import { type Time } from "lightweight-charts";
 import { z } from "zod";
 
@@ -21,4 +23,33 @@ export interface CandlestickData {
   low: number | undefined;
   close: number | undefined;
   volume: number | undefined;
+}
+
+export interface OptionType {
+  value: string;
+  label: string;
+  type?: string;
+  id: number;
+}
+
+export type DailyTrades =
+  RouterOutputs["trades"]["getTradesByDate"]["dailyTrades"];
+
+export interface Tag {
+  id: number;
+  name: string;
+  type: string;
+}
+
+export interface TagDetail {
+  value: string;
+  label: string;
+  id: number;
+  type?: string;
+}
+
+export interface TradeTags {
+  setup: TagDetail[];
+  mistake: TagDetail[];
+  custom: TagDetail[];
 }

@@ -1,7 +1,3 @@
-import type { AppRouter } from "~/server/api/root";
-
-import type { inferRouterOutputs } from "@trpc/server";
-
 import type {
   SeriesMarkerPosition,
   SeriesMarkerShape,
@@ -9,8 +5,7 @@ import type {
 } from "lightweight-charts";
 import moment from "moment";
 
-type RouterOutput = inferRouterOutputs<AppRouter>;
-type DailyTrades = RouterOutput["trades"]["getTradesByDate"];
+import type { DailyTrades, Tag, TagDetail, TradeTags } from "../type";
 
 const MILLISECONDS = 1000;
 
@@ -45,14 +40,40 @@ export const timeToLocal = (originalTime: string) => {
 export const formatToUnix = (timestamp: string) =>
   moment(timestamp).startOf("minute").valueOf() / MILLISECONDS;
 
-export const generateMarkers = ({ dailyTrades }: DailyTrades) => {
+export const formatDateForDetails = (date: string): string => {
+  return moment(date).format("dddd MMMM Do YYYY");
+};
+
+export const generateMarkers = (dailyTrades: DailyTrades) => {
   return (
-    dailyTrades?.map((trade) => ({
+    dailyTrades.map((trade) => ({
       time: trade.Marker as UTCTimestamp,
       position: "aboveBar" as SeriesMarkerPosition,
       color: trade.Volume > 0 ? GREEN_MARKER : RED_MARKER,
       shape: "arrowDown" as SeriesMarkerShape,
       text: `${trade.Volume} x ${trade.Price}`,
     })) ?? []
+  );
+};
+
+export const formatTradeTags = (data: Tag[]): TradeTags => {
+  return data.reduce<TradeTags>(
+    (result, tag) => {
+      const { id, name, type } = tag;
+      const newItem: TagDetail = { value: name, label: name, id, type };
+
+      if (type === "setup") {
+        result.setup.push(newItem);
+      }
+      if (type === "mistake") {
+        result.mistake.push(newItem);
+      }
+      if (type === "custom") {
+        result.custom.push(newItem);
+      }
+
+      return result;
+    },
+    { setup: [], mistake: [], custom: [] }
   );
 };

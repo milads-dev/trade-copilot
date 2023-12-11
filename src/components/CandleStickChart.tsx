@@ -71,7 +71,7 @@ export const CandleStickChart = () => {
       candleSeries.setData(candleSeriesData);
     }
 
-    if (dailyTrades) candleSeries.setMarkers(generateMarkers({ dailyTrades }));
+    if (dailyTrades) candleSeries.setMarkers(generateMarkers(dailyTrades));
 
     chart.timeScale().fitContent();
 
