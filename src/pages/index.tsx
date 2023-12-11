@@ -6,11 +6,6 @@ import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 
-import { CsvFileUpload } from "~/features/tradeHistory";
-import { api } from "~/utils/api";
-
-import moment from "moment";
-
 export default function Home() {
   return (
     <>
@@ -21,7 +16,7 @@ export default function Home() {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center space-y-5">
         <button className="btn btn-primary">
-          <Link href="/history">History </Link>
+          <Link href="/trades">Trade History </Link>
         </button>
         <AuthShowcase />
       </main>

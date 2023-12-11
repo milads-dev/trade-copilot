@@ -1,6 +1,7 @@
 import { registerRouter } from "~/server/api/routers/register";
 import { createTRPCRouter } from "~/server/api/trpc";
 
+import { tagsRouter } from "./routers/tags";
 import { tradesRouter } from "./routers/trades";
 
 /**
@@ -11,6 +12,7 @@ import { tradesRouter } from "./routers/trades";
 export const appRouter = createTRPCRouter({
   register: registerRouter,
   trades: tradesRouter,
+  tags: tagsRouter,
 });
 
 // export type definition of API

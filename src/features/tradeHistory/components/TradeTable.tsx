@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
+import Link from "next/link";
+
 import moment from "moment";
 
 type DailyTrade = {
@@ -34,6 +36,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
         container.removeEventListener("scroll", handleScroll);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -71,7 +74,18 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
                   ${Math.abs(Profit)}
                 </td>
                 <td>
-                  <button className="btn btn-ghost btn-xs">details</button>
+                  <button className="btn btn-ghost btn-xs">
+                    <Link
+                      href={{
+                        pathname: `/trades/${Symbol}`,
+                        query: {
+                          date: moment(openTimeStamp).format("YYYY-MM-DD"),
+                        },
+                      }}
+                    >
+                      details
+                    </Link>
+                  </button>
                 </td>
               </tr>
             )

@@ -20,12 +20,15 @@ type Context = {
 export const fetchTradeCount = async (
   ctx: Context,
   userId: string,
-  cursor: number | null | undefined
+  cursor: Date | null | undefined
 ) => {
   const initialTrade = await ctx.prisma.tradeHistory.findFirst({
     where: {
       userId,
-      ...(cursor ? { id: cursor } : {}),
+      ...(cursor ? { TimeStamp: cursor } : {}),
+    },
+    orderBy: {
+      TimeStamp: "asc",
     },
   });
 
@@ -51,4 +54,22 @@ export const fetchTradeCount = async (
   });
 
   return weeklyTradeCount;
+};
+
+export const generateDateRangeUrl = (
+  currentUrl: string,
+  start: Date | null,
+  end: Date | null
+): string => {
+  let newUrl;
+
+  if (start ?? end) {
+    const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
+    const formatEnd = end ? moment(end).format("MM/DD/YYYY") : "";
+    newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
+  } else {
+    newUrl = "/trades";
+  }
+
+  return newUrl;
 };

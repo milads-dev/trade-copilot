@@ -52,9 +52,9 @@ export const CsvFileUpload = () => {
     >
       {({
         getRootProps,
-        acceptedFile,
-        ProgressBar,
-        getRemoveFileProps,
+        _acceptedFile,
+        _ProgressBar,
+        _getRemoveFileProps,
       }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any) => (
         <div>
