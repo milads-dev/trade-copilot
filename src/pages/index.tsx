@@ -6,11 +6,6 @@ import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 
-import { CsvFileUpload } from "~/features/tradeHistory";
-import { api } from "~/utils/api";
-
-import moment from "moment";
-
 export default function Home() {
   return (
     <>
