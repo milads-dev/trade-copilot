@@ -31,7 +31,7 @@ export const tagsRouter = createTRPCRouter({
           data: {
             name: name,
             userId: ctx.session.user.id,
-            type: type,
+            type: type.toLowerCase(),
           },
         });
         if (tag) {

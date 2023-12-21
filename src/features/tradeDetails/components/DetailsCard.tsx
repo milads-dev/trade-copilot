@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { api } from "~/utils/api";
 
-import type { DailyTrades } from "../type";
+import type { DailyTrades, DetailsCardTag } from "../type";
 import { formatDateForDetails } from "../utils";
 import { TagSelect } from "./TagSelect";
 
@@ -32,49 +32,55 @@ export const DetailsCard = ({ trades }: Props) => {
 
   const { allTags, tradeTags } = data ?? {};
 
+  const TAGS: DetailsCardTag[] = [
+    {
+      type: "Setup",
+      className: "card-title mt-10",
+      value: tradeTags?.setup,
+      options: allTags?.setup,
+    },
+    {
+      type: "Mistake",
+      className: "card-title mt-4",
+      value: tradeTags?.mistake,
+      options: allTags?.mistake,
+    },
+    {
+      type: "Custom",
+      className: "card-title mt-4",
+      value: tradeTags?.custom,
+      options: allTags?.custom,
+    },
+  ];
+
   return (
     <div className="card mr-10 w-full bg-base-200 pr-5">
       <div className="card-body">
         <div className="flex items-center justify-between">
-          <h2 className="card-title">Symbol:</h2>
+          <div className="card-title">Symbol:</div>
           <span className="card-title ml-2">{symbol}</span>
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <h3 className="card-title">PnL Realized:</h3>
-          {tradePnL ? (
-            <span
-              className={`card-title ml-2 ${
-                tradePnL > 0 ? "text-success" : "text-error"
-              } `}
-            >
-              ${tradePnL}
-            </span>
-          ) : null}
+          <div className="card-title">PnL Realized:</div>
+          {tradePnL &&
+            (tradePnL > 0 ? (
+              <span className="card-title text-success">${tradePnL}</span>
+            ) : (
+              <span className="card-title  text-error">
+                $({Math.abs(tradePnL).toFixed(2)})
+              </span>
+            ))}
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <h3 className="card-title">Date:</h3>
+          <div className="card-title">Date:</div>
           <span className="card-title ml-2">{formatDateForDetails(date)}</span>
         </div>
-        <div className="card-title mt-10">Setup</div>
-        <TagSelect
-          value={tradeTags?.setup}
-          options={allTags?.setup}
-          tagType="setup"
-        />
-
-        <div className="card-title mt-4">Mistake</div>
-        <TagSelect
-          value={tradeTags?.mistake}
-          options={allTags?.mistake}
-          tagType="mistake"
-        />
-
-        <div className="card-title mt-4">Custom</div>
-        <TagSelect
-          value={tradeTags?.custom}
-          options={allTags?.custom}
-          tagType="custom"
-        />
+        {TAGS.map(({ value, options, type, className }) => (
+          <div key={type}>
+            <div className={className}> {type}</div>
+            <TagSelect value={value} options={options} tagType={type} />
+          </div>
+        ))}
       </div>
     </div>
   );
