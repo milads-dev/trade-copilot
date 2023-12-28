@@ -3,7 +3,7 @@ import "react-calendar/dist/Calendar.css";
 
 import { useRouter } from "next/router";
 
-import { CalendarComponent } from "~/components/CalendarComponent";
+import { DateRangeCalendar } from "~/components/DateRangeCalendar";
 
 import { DateRangeSchema, type DateRangeType } from "../types";
 
@@ -81,7 +81,7 @@ export const DateRangeButton = ({ passDateChange }: Props) => {
         )}
       </button>
       {calendarVisible && (
-        <CalendarComponent
+        <DateRangeCalendar
           dateRange={dateRange}
           onDateChange={handleDateChange}
         />

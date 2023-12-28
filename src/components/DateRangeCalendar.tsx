@@ -8,7 +8,7 @@ interface Props {
   onDateChange: (dates: unknown) => void;
 }
 
-export const CalendarComponent = ({ dateRange, onDateChange }: Props) => {
+export const DateRangeCalendar = ({ dateRange, onDateChange }: Props) => {
   return (
     <div className="absolute right-0 top-12 z-50 ">
       <Calendar onChange={onDateChange} value={dateRange} selectRange />
