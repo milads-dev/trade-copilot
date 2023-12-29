@@ -38,21 +38,15 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
   const date = router.query.date as string;
 
   const removeTag = api.tags.removeTag.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
   });
 
   const addTagToTradeMutation = api.tags.addTagToTrade.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
   });
 
   const mutation = api.tags.addTag.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
     onError(error) {
       alert(error);
     },
