@@ -12,6 +12,7 @@ export const NoteEditor = ({ notes, handleEditorUpdate }: Props) => {
     <div>
       <Editor
         initialValue={notes}
+        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
         init={{
           setup(editor) {
             editor.on("init", () => {
