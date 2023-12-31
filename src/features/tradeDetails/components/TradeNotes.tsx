@@ -17,7 +17,7 @@ export const TradeNotes = () => {
   const [disabled, setDisabled] = useState(true);
   const [editorLoading, setEditorLoading] = useState(true);
 
-  const { data } = api.tradeDetails.getTradeNotes.useQuery(
+  const { data } = api.tradeDetails.getTradeDetails.useQuery(
     { symbol, date },
     {
       refetchOnWindowFocus: false,
@@ -27,9 +27,8 @@ export const TradeNotes = () => {
   const { notes } = data ?? {};
 
   const addTradeNotes = api.tradeDetails.addTradeNotes.useMutation({
-    onSuccess() {
-      void ctx.tradeDetails.invalidate();
-    },
+    onSuccess: () =>
+      ctx.tradeDetails.getTradeDetails.invalidate({ symbol, date }),
   });
   const handleEditorUpdate = (note: string, type: string) => {
     if (type === "change") setDisabled(false);

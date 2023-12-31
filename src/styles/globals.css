@@ -12,4 +12,9 @@
 .auth_input_error {
     @apply mt-2 text-xs italic text-error
 }
+.trade_details_card {
+    @apply mt-5 flex items-center justify-between
+
+}
+
 }

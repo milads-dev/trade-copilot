@@ -40,7 +40,7 @@ export const tradeDetails = createTRPCRouter({
         console.error("Error creating trade:", trpcError.message);
       }
     }),
-  getTradeNotes: protectedProcedure
+  getTradeDetails: protectedProcedure
     .input(
       z.object({
         symbol: z.string(),
@@ -61,10 +61,45 @@ export const tradeDetails = createTRPCRouter({
             message: "No Trade Details",
           });
 
-        return { notes: tradeDetails.notes ?? "" };
+        return { notes: tradeDetails.notes ?? "", rating: tradeDetails.rating };
       } catch (error) {
         const trpcError = error as TRPCError;
         console.error("Error creating trade:", trpcError.message);
+      }
+    }),
+  addTradeRating: protectedProcedure
+    .input(
+      z.object({
+        symbol: z.string(),
+        date: z.string(),
+        rating: z.number().or(z.null()),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { symbol, date, rating } = input;
+
+      try {
+        const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+          where: { symbol, date },
+        });
+
+        if (!tradeDetails)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No Trade Details",
+          });
+
+        await ctx.prisma.tradeDetails.update({
+          where: { id: tradeDetails.id },
+          data: {
+            rating,
+          },
+        });
+
+        return { status: 201, message: "Success" };
+      } catch (error) {
+        const trpcError = error as TRPCError;
+        console.error("Error:", trpcError.message);
       }
     }),
 });
