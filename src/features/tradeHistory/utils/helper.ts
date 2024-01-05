@@ -63,12 +63,12 @@ export const generateDateRangeUrl = (
 ): string => {
   let newUrl;
 
-  if (start ?? end) {
+  if (start && end) {
     const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
     const formatEnd = end ? moment(end).format("MM/DD/YYYY") : "";
     newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
   } else {
-    newUrl = "/trades";
+    newUrl = `${currentUrl}`;
   }
 
   return newUrl;

@@ -185,7 +185,8 @@ export const tradesRouter = createTRPCRouter({
           SELECT "Symbol", "TimeStamp", "Volume", "Price", "Profit"
           FROM "TradeHistory"
           WHERE DATE_TRUNC('day', "TimeStamp") = DATE_TRUNC('day', ${date}::date)
-          AND "Symbol" = ${symbol};
+          AND "Symbol" = ${symbol}
+          ORDER BY "TimeStamp" ASC;
         `;
         const formatedTrades = result.map((trades) => ({
           ...trades,
