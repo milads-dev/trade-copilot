@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { CandleStickChart } from "~/components/CandleStickChart";
-import ArrowLeft from "~/components/icons/ArrowLeft";
+import ArrowLeft from "~/components/icons/ArrowIcon";
 import { DetailsCard } from "~/features/tradeDetails";
 import { formatUtcTimestamp } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
@@ -17,7 +17,7 @@ const Symbol = () => {
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
 
-  const { data } = api.trades.getTradesByDate.useQuery(
+  const { data, isSuccess } = api.trades.getTradesByDate.useQuery(
     { symbol: symbol, date: date },
     {
       refetchOnWindowFocus: false,
@@ -34,6 +34,7 @@ const Symbol = () => {
         <meta name="description" content="The Trade Details Page" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <main className="flex min-h-screen flex-col space-y-5 p-10">
         <div className="flex w-full items-center justify-between">
           <button className="btn w-40" onClick={() => router.back()}>
@@ -42,12 +43,12 @@ const Symbol = () => {
           </button>
         </div>
 
-        <div className="flex justify-between">
-          <DetailsCard trades={dailyTrades} />
+        <div className="z-10 flex justify-between">
+          <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
           <CandleStickChart />
         </div>
-        <div className="overflow-x-auto px-10">
-          <table className="table">
+        <div className="h-56 overflow-scroll px-10">
+          <table className="table table-zebra table-pin-rows">
             <thead>
               <tr>
                 <th>Symbol</th>

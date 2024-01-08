@@ -8,16 +8,17 @@ import { TradeNotes } from "./TradeNotes";
 
 interface Props {
   trades?: DailyTrades;
+  isSuccess: boolean;
 }
 
-export const DetailsCard = ({ trades }: Props) => {
+export const DetailsCard = ({ trades, isSuccess }: Props) => {
   const router = useRouter();
 
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
   const [tagType, setTagType] = useState("details");
 
-  return (
+  return isSuccess ? (
     <div className="card mr-10 w-full bg-base-200 pr-5">
       <div className="card-body w-full">
         <div>
@@ -44,6 +45,10 @@ export const DetailsCard = ({ trades }: Props) => {
           </div>
         )}
       </div>
+    </div>
+  ) : (
+    <div className=" flex w-full items-center justify-center bg-base-200 ">
+      <span className="loading loading-dots"></span>
     </div>
   );
 };
