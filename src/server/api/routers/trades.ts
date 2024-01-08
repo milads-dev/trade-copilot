@@ -1,6 +1,7 @@
 import { candleStickSchema } from "~/features/tradeDetails/type";
 import {
   formatToUnix,
+  generateTradeDetailsUrl,
   getSymbol,
   timeToLocal,
 } from "~/features/tradeDetails/utils";
@@ -193,10 +194,54 @@ export const tradesRouter = createTRPCRouter({
           Marker: formatToUnix(trades.TimeStamp),
         }));
 
-        return { dailyTrades: formatedTrades };
+        const lastTrade = await ctx.prisma.tradeHistory.findFirst({
+          where: {
+            TimeStamp: {
+              lt: formatedTrades[0]?.TimeStamp,
+            },
+          },
+          select: { Symbol: true, TimeStamp: true },
+          orderBy: {
+            TimeStamp: "desc",
+          },
+        });
+
+        const lastTradeUrl = lastTrade
+          ? generateTradeDetailsUrl(
+              "/trades",
+              lastTrade.Symbol,
+              lastTrade.TimeStamp
+            )
+          : null;
+
+        const nextTrade = await ctx.prisma.tradeHistory.findFirst({
+          where: {
+            TimeStamp: {
+              gt: formatedTrades[formatedTrades.length - 1]?.TimeStamp,
+            },
+          },
+          select: { Symbol: true, TimeStamp: true },
+          orderBy: {
+            TimeStamp: "asc",
+          },
+        });
+
+        const nextTradeUrl = nextTrade
+          ? generateTradeDetailsUrl(
+              "/trades",
+              nextTrade.Symbol,
+              nextTrade.TimeStamp
+            )
+          : null;
+
+        return {
+          dailyTrades: formatedTrades,
+          lastTrade: lastTradeUrl,
+          nextTrade: nextTradeUrl,
+        };
       } catch (error) {
         console.error("Error retrieving trades:", error);
-        return { dailyTrades: [] };
+        return { dailyTrades: [], lastTrade: null, nextTrade: null };
       }
     }),
   getTradeDetails: protectedProcedure
