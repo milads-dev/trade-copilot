@@ -59,13 +59,17 @@ export const fetchTradeCount = async (
 export const generateDateRangeUrl = (
   currentUrl: string,
   start: Date | null,
-  end: Date | null
+  end?: Date | null
 ): string => {
   let newUrl;
 
   if (start && end) {
     const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
     const formatEnd = end ? moment(end).format("MM/DD/YYYY") : "";
+    newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
+  } else if (start) {
+    const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
+    const formatEnd = start ? moment(start).format("MM/DD/YYYY") : "";
     newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
   } else {
     newUrl = `${currentUrl}`;
