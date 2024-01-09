@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 import { CandleStickChart } from "~/components/CandleStickChart";
 import ArrowLeft from "~/components/icons/ArrowIcon";
-import { DetailsCard } from "~/features/tradeDetails";
+import { DetailsCard, TradeNavigationButtons } from "~/features/tradeDetails";
 import { formatUtcTimestamp } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
 
@@ -24,7 +24,7 @@ const Symbol = () => {
     }
   );
 
-  const { dailyTrades } = data ?? {};
+  const { dailyTrades, lastTrade, nextTrade } = data ?? {};
   const reversedTrades = dailyTrades ? [...dailyTrades].reverse() : [];
 
   return (
@@ -37,10 +37,14 @@ const Symbol = () => {
 
       <main className="flex min-h-screen flex-col space-y-5 p-10">
         <div className="flex w-full items-center justify-between">
-          <button className="btn w-40" onClick={() => router.back()}>
+          <button
+            className="btn w-40"
+            onClick={() => void router.push("/trades")}
+          >
             <ArrowLeft />
             Back
           </button>
+          <TradeNavigationButtons lastTrade={lastTrade} nextTrade={nextTrade} />
         </div>
 
         <div className="z-10 flex justify-between">
