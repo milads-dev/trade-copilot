@@ -14,7 +14,7 @@ export const TradeNoteSkeleton = () => {
             ))}
           </div>
           <div className="flex h-10 items-center space-x-5 rounded bg-slate-700 pl-7">
-            {Array.from({ length: 14 }, (_, index) => (
+            {Array.from({ length: 13 }, (_, index) => (
               <div
                 key={index}
                 className="h-5 w-7 rounded-sm bg-slate-900"

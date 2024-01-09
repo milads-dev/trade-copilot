@@ -42,8 +42,8 @@ export const CandleStickChart = () => {
         horzLines: { color: "#444" },
       },
 
-      width: 1000,
-      height: 715,
+      width: 0,
+      height: 690,
 
       crosshair: {
         mode: 0,

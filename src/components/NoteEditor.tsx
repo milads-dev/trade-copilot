@@ -30,9 +30,8 @@ export const NoteEditor = ({ notes, handleEditorUpdate }: Props) => {
           content_css: "dark",
           skin: "oxide-dark",
           resize: false,
-          width: 700,
-          min_height: 500,
-          max_height: 500,
+          min_height: 480,
+          max_height: 480,
 
           menubar: true,
           plugins: [
