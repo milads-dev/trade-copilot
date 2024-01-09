@@ -1,6 +1,7 @@
 import { candleStickSchema } from "~/features/tradeDetails/type";
 import {
   formatToUnix,
+  generateTradeDetailsUrl,
   getSymbol,
   timeToLocal,
 } from "~/features/tradeDetails/utils";
@@ -150,21 +151,97 @@ export const tradesRouter = createTRPCRouter({
       try {
         if (symbol.length === 0 || date.length === 0)
           return { dailyTrades: [] };
+
+        const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+          where: {
+            symbol,
+            date,
+          },
+        });
+        if (!tradeDetails) {
+          const createdTradeDetails = await ctx.prisma.tradeDetails.create({
+            data: { symbol, date },
+          });
+          const tradeHistoryIds = await ctx.prisma.$queryRaw<{ id: number }[]>`
+          SELECT "id"
+          FROM "TradeHistory"
+          WHERE DATE_TRUNC('day', "TimeStamp") = DATE_TRUNC('day', ${date}::date)
+          AND "Symbol" = ${symbol};
+        `;
+
+          const formattedTradeIds = tradeHistoryIds.map((item) => item.id);
+          await ctx.prisma.tradeHistory.updateMany({
+            where: {
+              id: {
+                in: formattedTradeIds,
+              },
+            },
+            data: {
+              tradeDetailsId: createdTradeDetails.id,
+            },
+          });
+        }
+
         const result = await ctx.prisma.$queryRaw<dataBaseTradeArrayType>`
           SELECT "Symbol", "TimeStamp", "Volume", "Price", "Profit"
           FROM "TradeHistory"
           WHERE DATE_TRUNC('day', "TimeStamp") = DATE_TRUNC('day', ${date}::date)
-          AND "Symbol" = ${symbol};
+          AND "Symbol" = ${symbol}
+          ORDER BY "TimeStamp" ASC;
         `;
         const formatedTrades = result.map((trades) => ({
           ...trades,
           Marker: formatToUnix(trades.TimeStamp),
         }));
 
-        return { dailyTrades: formatedTrades };
+        const lastTrade = await ctx.prisma.tradeHistory.findFirst({
+          where: {
+            TimeStamp: {
+              lt: formatedTrades[0]?.TimeStamp,
+            },
+          },
+          select: { Symbol: true, TimeStamp: true },
+          orderBy: {
+            TimeStamp: "desc",
+          },
+        });
+
+        const lastTradeUrl = lastTrade
+          ? generateTradeDetailsUrl(
+              "/trades",
+              lastTrade.Symbol,
+              lastTrade.TimeStamp
+            )
+          : null;
+
+        const nextTrade = await ctx.prisma.tradeHistory.findFirst({
+          where: {
+            TimeStamp: {
+              gt: formatedTrades[formatedTrades.length - 1]?.TimeStamp,
+            },
+          },
+          select: { Symbol: true, TimeStamp: true },
+          orderBy: {
+            TimeStamp: "asc",
+          },
+        });
+
+        const nextTradeUrl = nextTrade
+          ? generateTradeDetailsUrl(
+              "/trades",
+              nextTrade.Symbol,
+              nextTrade.TimeStamp
+            )
+          : null;
+
+        return {
+          dailyTrades: formatedTrades,
+          lastTrade: lastTradeUrl,
+          nextTrade: nextTradeUrl,
+        };
       } catch (error) {
         console.error("Error retrieving trades:", error);
-        return { dailyTrades: [] };
+        return { dailyTrades: [], lastTrade: null, nextTrade: null };
       }
     }),
   getTradeDetails: protectedProcedure

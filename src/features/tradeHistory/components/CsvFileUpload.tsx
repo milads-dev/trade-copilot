@@ -17,15 +17,13 @@ export const CsvFileUpload = () => {
   const ctx = api.useContext();
 
   const mutation = api.trades.addTrades.useMutation({
-    onSuccess: () => {
-      void ctx.trades.invalidate();
-    },
+    onSuccess: () => ctx.trades.invalidate(),
   });
 
   const handleOnDrop = (input: CsvObject) => {
     const { data, error } = input;
     //TODO: Refactor Error Handling for UI
-    console.log(
+    console.error(
       "🚀 ~ file: csvFileUpload.tsx:19 ~ handleOnDrop ~ error:",
       error
     );

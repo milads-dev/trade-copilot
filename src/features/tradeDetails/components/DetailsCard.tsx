@@ -1,81 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { api } from "~/utils/api";
-
 import type { DailyTrades } from "../type";
-import { formatDateForDetails } from "../utils";
-import { TagSelect } from "./TagSelect";
+import { TradeDetails } from "./TradeDetails";
+import { TradeNotes } from "./TradeNotes";
 
 interface Props {
   trades?: DailyTrades;
+  isSuccess: boolean;
 }
 
-export const DetailsCard = ({ trades }: Props) => {
+export const DetailsCard = ({ trades, isSuccess }: Props) => {
   const router = useRouter();
 
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
+  const [tagType, setTagType] = useState("details");
 
-  const { data } = api.tags.getTags.useQuery(
-    { symbol, date },
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
-
-  const tradePnL = trades?.reduce(
-    (accumulator, currentTrade) => accumulator + currentTrade.Profit,
-    0
-  );
-
-  const { allTags, tradeTags } = data ?? {};
-
-  return (
+  return isSuccess ? (
     <div className="card mr-10 w-full bg-base-200 pr-5">
-      <div className="card-body">
-        <div className="flex items-center justify-between">
-          <h2 className="card-title">Symbol:</h2>
-          <span className="card-title ml-2">{symbol}</span>
+      <div className="card-body w-full">
+        <div>
+          <div className="tabs justify-between self-center">
+            {["details", "notes"].map((tab) => (
+              <p
+                key={tab}
+                className={`tab tab-bordered uppercase ${
+                  tagType === tab ? "tab-active" : ""
+                }`}
+                onClick={() => setTagType(tab)}
+              >
+                {tab}
+              </p>
+            ))}
+          </div>
         </div>
-        <div className="mt-5 flex items-center justify-between">
-          <h3 className="card-title">PnL Realized:</h3>
-          {tradePnL ? (
-            <span
-              className={`card-title ml-2 ${
-                tradePnL > 0 ? "text-success" : "text-error"
-              } `}
-            >
-              ${tradePnL}
-            </span>
-          ) : null}
-        </div>
-        <div className="mt-5 flex items-center justify-between">
-          <h3 className="card-title">Date:</h3>
-          <span className="card-title ml-2">{formatDateForDetails(date)}</span>
-        </div>
-        <div className="card-title mt-10">Setup</div>
-        <TagSelect
-          value={tradeTags?.setup}
-          options={allTags?.setup}
-          tagType="setup"
-        />
-
-        <div className="card-title mt-4">Mistake</div>
-        <TagSelect
-          value={tradeTags?.mistake}
-          options={allTags?.mistake}
-          tagType="mistake"
-        />
-
-        <div className="card-title mt-4">Custom</div>
-        <TagSelect
-          value={tradeTags?.custom}
-          options={allTags?.custom}
-          tagType="custom"
-        />
+        {tagType === "details" && (
+          <TradeDetails trades={trades} symbol={symbol} date={date} />
+        )}
+        {tagType === "notes" && (
+          <div className="mt-5 self-center">
+            <TradeNotes />
+          </div>
+        )}
       </div>
+    </div>
+  ) : (
+    <div className=" flex w-full items-center justify-center bg-base-200 ">
+      <span className="loading loading-dots"></span>
     </div>
   );
 };

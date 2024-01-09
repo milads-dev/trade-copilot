@@ -1,18 +1,20 @@
 import "react-calendar/dist/Calendar.css";
 
 import { type GetServerSidePropsContext } from "next";
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
+import { Drawer } from "~/components/auth/Drawer";
+import ArrowLeft from "~/components/icons/ArrowIcon";
 import {
   CsvFileUpload,
+  DateRangeButton,
   DateRangeSchema,
+  TradeTable,
   generateDateRangeUrl,
 } from "~/features/tradeHistory";
-import { DateRangeButton } from "~/features/tradeHistory/components/DateRangeButton";
-import { TradeTable } from "~/features/tradeHistory/components/TradeTable";
 import { api } from "~/utils/api";
 
 const Trades = () => {
@@ -51,50 +53,52 @@ const Trades = () => {
         <meta name="description" content="The Trade History Page" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col p-10">
-        <div className="mb-5 flex justify-between">
-          <button className="btn btn-outline" onClick={() => void signOut()}>
-            Sign Out
-          </button>
+      <Drawer>
+        <div className="flex min-h-screen flex-col p-10">
+          <div className="mb-5 flex self-end">
+            <CsvFileUpload />
+          </div>
 
-          <CsvFileUpload />
-        </div>
+          <div className="relative my-9 flex w-full justify-between">
+            <button className="btn w-40" onClick={() => router.back()}>
+              <ArrowLeft />
+              Back
+            </button>
+            <DateRangeButton passDateChange={handleDateChange} />
+          </div>
 
-        <div className="relative mt-9 self-end">
-          <DateRangeButton passDateChange={handleDateChange} />
-        </div>
-
-        <div className="mx-auto h-[48rem] w-full overflow-x-auto">
-          {isLoading ? (
-            <div className="flex h-[80vh] flex-col items-center justify-center space-y-5">
-              <Image
-                src="/assets/searchingClouds.svg"
-                alt="Searching"
-                layout="fixed"
-                width={400}
-                height={100}
-              />
-              <div className="animate-pulse text-white">
-                {isLoading ? "Loading..." : "No Trades Found"}
+          <div className="mx-auto h-[48rem] w-full overflow-x-auto">
+            {isLoading ? (
+              <div className="flex h-[80vh] flex-col items-center justify-center space-y-5">
+                <Image
+                  src="/assets/searchingClouds.svg"
+                  alt="Searching"
+                  layout="fixed"
+                  width={400}
+                  height={100}
+                />
+                <div className="animate-pulse text-white">
+                  {isLoading ? "Loading..." : "No Trades Found"}
+                </div>
               </div>
-            </div>
-          ) : null}
-          {trades?.length ?? 0 > 0 ? (
-            <TradeTable trades={trades} handleNextTrades={handleNextTrades} />
-          ) : (
-            <div className="flex h-2/3 flex-col items-center justify-center space-y-8">
-              <Image
-                src="/assets/not-found.svg"
-                alt="No Data"
-                layout="fixed"
-                width={400}
-                height={100}
-              />
-              <span>No Trades Found</span>
-            </div>
-          )}
+            ) : null}
+            {trades?.length ?? 0 > 0 ? (
+              <TradeTable trades={trades} handleNextTrades={handleNextTrades} />
+            ) : (
+              <div className="flex h-2/3 flex-col items-center justify-center space-y-8">
+                <Image
+                  src="/assets/not-found.svg"
+                  alt="No Data"
+                  layout="fixed"
+                  width={400}
+                  height={100}
+                />
+                <span>No Trades Found</span>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </Drawer>
     </>
   );
 };

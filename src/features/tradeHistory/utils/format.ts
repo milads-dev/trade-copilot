@@ -104,12 +104,13 @@ const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {
     const bDate = moment(b.TimeStamp);
 
     if (aDate.isSame(bDate, "month")) {
-      return aDate.isSame(bDate, "day")
-        ? a.Symbol.localeCompare(b.Symbol)
-        : aDate.date() - bDate.date();
+      if (aDate.isSame(bDate, "day")) {
+        return a.Symbol.localeCompare(b.Symbol);
+      } else {
+        return aDate.date() - bDate.date();
+      }
     }
-
-    return aDate.month() - bDate.month();
+    return aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
   });
 };
 

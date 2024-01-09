@@ -6,7 +6,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { CandleStickChart } from "~/components/CandleStickChart";
-import { DetailsCard } from "~/features/tradeDetails";
+import ArrowLeft from "~/components/icons/ArrowIcon";
+import { DetailsCard, TradeNavigationButtons } from "~/features/tradeDetails";
 import { formatUtcTimestamp } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
 
@@ -16,44 +17,64 @@ const Symbol = () => {
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
 
-  const { data } = api.trades.getTradesByDate.useQuery(
+  const { data, isSuccess } = api.trades.getTradesByDate.useQuery(
     { symbol: symbol, date: date },
     {
       refetchOnWindowFocus: false,
     }
   );
 
-  const { dailyTrades } = data ?? {};
+  const { dailyTrades, lastTrade, nextTrade } = data ?? {};
+  const reversedTrades = dailyTrades ? [...dailyTrades].reverse() : [];
 
   return (
     <>
       <Head>
-        <title>Trade History</title>
-        <meta name="description" content="The Trade History Page" />
+        <title>Trade Details</title>
+        <meta name="description" content="The Trade Details Page" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col space-y-5 p-10">
-        <button className="btn" onClick={() => router.back()}>
-          Go Back
-        </button>
 
-        <div className="flex justify-between">
-          <DetailsCard trades={dailyTrades} />
+      <main className="flex min-h-screen flex-col space-y-5 p-10">
+        <div className="flex w-full items-center justify-between">
+          <button
+            className="btn w-40"
+            onClick={() => void router.push("/trades")}
+          >
+            <ArrowLeft />
+            Back
+          </button>
+          <TradeNavigationButtons lastTrade={lastTrade} nextTrade={nextTrade} />
+        </div>
+
+        <div className="z-10 flex justify-between">
+          <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
           <CandleStickChart />
         </div>
-        {dailyTrades?.length !== 0 ? (
-          <ul className="grid grid-cols-2 items-center gap-4">
-            {dailyTrades?.map((item, index) => (
-              <li className="" key={index}>
-                <p>{`Symbol: ${item.Symbol}`}</p>
-                <p>{`TimeStamp: ${formatUtcTimestamp(item.TimeStamp)}`}</p>
-                <p>{`Volume: ${item.Volume}`}</p>
-                <p>{`Price: ${item.Price}`}</p>
-                <p>{`Profit: ${item.Profit}`}</p>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <div className="h-56 overflow-scroll px-10">
+          <table className="table table-zebra table-pin-rows">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Time</th>
+                <th>Volume</th>
+                <th>Price</th>
+                <th>Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reversedTrades.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.Symbol}</td>
+                  <td>{formatUtcTimestamp(item.TimeStamp)}</td>
+                  <td>{item.Volume}</td>
+                  <td>{item.Price}</td>
+                  <td>{item.Profit}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </main>
     </>
   );

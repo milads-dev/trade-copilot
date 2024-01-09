@@ -21,12 +21,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -42,9 +42,9 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String             @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?            @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
@@ -64,40 +64,49 @@ model VerificationToken {
 }
 
 model TradeHistory {
-  id        Int      @id @default(autoincrement())
-  Symbol    String
-  TimeStamp DateTime 
-  userId    String
+  id             Int           @id @default(autoincrement())
+  Symbol         String
+  TimeStamp      DateTime
+  userId         String
+  Volume         Float
+  Price          Float
+  Profit         Float
+  tradeDetails   TradeDetails? @relation(fields: [tradeDetailsId], references: [id])
+  tradeDetailsId Int?
+  user           User          @relation(fields: [userId], references: [id])
 
-  user User @relation(fields: [userId], references: [id])
-
-  Volume Float
-  Price  Float
-  Profit Float
-
-  @@unique([Symbol, TimeStamp, userId, Volume, Price, Profit])
+  @@unique([Symbol, TimeStamp, userId])
 }
 
 model Tag {
-  id     Int    @id @default(autoincrement())
-  name   String
-  type   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-  tradeTags     TradeTagRelation[]
+  id        Int                @id @default(autoincrement())
+  name      String
+  type      String
+  userId    String
+  user      User               @relation(fields: [userId], references: [id])
+  tradeTags TradeTagRelation[]
 
   @@unique([name, userId])
 }
 
 model TradeTagRelation {
-  id      Int      @id @default(autoincrement())
-  tagId   Int
-  symbol  String
-  date    String
-  userId  String
+  id     Int    @id @default(autoincrement())
+  tagId  Int
+  symbol String
+  date   String
+  userId String
 
-  tag     Tag      @relation(fields: [tagId], references: [id])
-  user    User     @relation(fields: [userId], references: [id])
+  tag  Tag  @relation(fields: [tagId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@unique([tagId, symbol, date, userId])
+}
+
+model TradeDetails {
+  id           Int            @id @default(autoincrement())
+  symbol       String
+  date         String
+  tradeHistory TradeHistory[]
+  rating       Int?
+  notes        String?        @db.Text
 }

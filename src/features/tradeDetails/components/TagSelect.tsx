@@ -22,14 +22,14 @@ import { DeleteTagIcon } from "./DeleteTagIcon";
 interface Props {
   value: TagDetail[] | undefined;
   options: TagDetail[] | undefined;
-  tagType: "setup" | "custom" | "mistake";
+  tagType: "Setup" | "Mistake" | "Custom";
 }
 
 export const TagSelect = ({ value, options, tagType }: Props) => {
   const tagColors = {
-    setup: "#359c60",
-    mistake: "#FF5630",
-    custom: "#0c98d8",
+    Setup: "#359c60",
+    Mistake: "#FF5630",
+    Custom: "#0c98d8",
   };
   const router = useRouter();
   const ctx = api.useContext();
@@ -38,21 +38,15 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
   const date = router.query.date as string;
 
   const removeTag = api.tags.removeTag.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
   });
 
   const addTagToTradeMutation = api.tags.addTagToTrade.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
   });
 
   const mutation = api.tags.addTag.useMutation({
-    onSuccess() {
-      void ctx.tags.invalidate();
-    },
+    onSuccess: () => ctx.tags.invalidate(),
     onError(error) {
       alert(error);
     },
@@ -92,8 +86,6 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
       backgroundColor: "black",
       borderColor: "white",
       borderWidth: 1,
-      maxHeight: "225px",
-      overflow: "scroll",
     }),
     option: (baseStyles: CSSObjectWithLabel) => ({
       ...baseStyles,
@@ -117,6 +109,7 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
   };
   return (
     <CreatableSelect
+      maxMenuHeight={225}
       value={value}
       instanceId={"Trade-Tag-Selector"}
       isMulti

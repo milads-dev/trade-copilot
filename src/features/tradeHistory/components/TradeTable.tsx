@@ -60,18 +60,20 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
                 <td>
                   {moment(openTimeStamp).format("MMMM Do YYYY")}
                   <br />
-                  <span className="badge badge-ghost badge-sm">
+                  <span className="badge-ghost badge-sm hidden md:badge">
                     {`${moment(openTimeStamp).format("h:mm:ss a")} -> ${moment(
                       closeTimeStamp
                     ).format("h:mm:ss a")}`}
                   </span>
                 </td>
-                <td
-                  className={`badge badge-outline  mt-6  ${
-                    Profit > 0 ? "badge-success" : "badge-error"
-                  }`}
-                >
-                  ${Math.abs(Profit)}
+                <td>
+                  <span
+                    className={`badge badge-outline px-5 py-4 ${
+                      Profit > 0 ? "badge-success" : "badge-error"
+                    }`}
+                  >
+                    ${Math.abs(Profit)}
+                  </span>
                 </td>
                 <td>
                   <button className="btn btn-ghost btn-xs">

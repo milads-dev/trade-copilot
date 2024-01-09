@@ -53,3 +53,10 @@ export interface TradeTags {
   mistake: TagDetail[];
   custom: TagDetail[];
 }
+
+export type DetailsCardTag = {
+  type: "Setup" | "Mistake" | "Custom";
+  className: string;
+  value: TagDetail[] | undefined; // Replace with the actual type you expect for value
+  options: TagDetail[] | undefined; // Replace with the actual type you expect for options
+};
