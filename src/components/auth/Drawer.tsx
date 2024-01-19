@@ -16,7 +16,7 @@ export const Drawer = ({ children }: Props) => {
         {/* Drawer Icon */}
         <label
           htmlFor="my-drawer"
-          className="btn btn-primary btn-outline drawer-button tooltip tooltip-secondary tooltip-right absolute left-12 top-12 z-20 flex"
+          className="btn btn-primary btn-outline drawer-button tooltip tooltip-secondary tooltip-right absolute left-10 top-12 z-20 flex"
           data-tip="Open Drawer"
         >
           <DrawerIcon />
