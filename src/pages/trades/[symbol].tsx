@@ -47,11 +47,17 @@ const Symbol = () => {
           <TradeNavigationButtons lastTrade={lastTrade} nextTrade={nextTrade} />
         </div>
 
-        <div className="z-10 flex justify-between">
-          <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
-          <CandleStickChart />
+        <div className="z-10">
+          <div className="flex w-full flex-col xl:flex-row xl:space-x-5">
+            <div className="order-2 mt-5 w-[100%] xl:order-1 xl:mt-0 xl:w-[40%]">
+              <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
+            </div>
+            <div className="xl:order2 order-1 w-[100%] xl:w-[60%]">
+              <CandleStickChart />
+            </div>
+          </div>
         </div>
-        <div className="h-56 overflow-scroll px-10">
+        <div className="h-56 overflow-scroll">
           <table className="table table-zebra table-pin-rows">
             <thead>
               <tr>

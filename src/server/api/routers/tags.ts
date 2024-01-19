@@ -1,10 +1,18 @@
 import { formatTradeTags } from "~/features/tradeDetails";
+import { generateTagQuery } from "~/features/tradeStats";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
+import { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 import { z } from "zod";
 
+interface Tag {
+  tagId: number;
+  name: string;
+  type: string;
+  count: number;
+}
 export const tagsRouter = createTRPCRouter({
   addTag: protectedProcedure
     .input(
@@ -160,6 +168,35 @@ export const tagsRouter = createTRPCRouter({
         return tradeTag;
       } catch (error) {
         console.error("Error adding tag to trade", error);
+      }
+    }),
+  getStats: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().nullish(),
+        endDate: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { startDate, endDate } = input;
+
+      try {
+        const tagQuery = generateTagQuery(startDate, endDate);
+
+        const tags = await ctx.prisma.$queryRaw<Tag[]>(Prisma.sql([tagQuery]));
+
+        if (!tags)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Error Retrieving Tag data",
+          });
+
+        return {
+          tags,
+        };
+      } catch (error) {
+        console.error("Error retrieving tag data:", error);
+        return {};
       }
     }),
 });

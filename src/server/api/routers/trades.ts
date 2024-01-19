@@ -15,6 +15,8 @@ import {
 } from "~/features/tradeHistory";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
+import { TRPCError } from "@trpc/server";
+
 import { z } from "zod";
 
 export const tradesRouter = createTRPCRouter({
@@ -282,6 +284,69 @@ export const tradesRouter = createTRPCRouter({
       } catch (error) {
         console.error("Error retrieving candles:", error);
         return { data: [] };
+      }
+    }),
+
+  getStats: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().nullish(),
+        endDate: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { startDate, endDate } = input;
+
+      try {
+        let response;
+
+        if (typeof startDate === "string" && typeof endDate === "string") {
+          const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
+            startDate,
+            endDate
+          );
+
+          response = await ctx.prisma.tradeHistory.findMany({
+            where: {
+              userId: ctx.session.user.id,
+              TimeStamp: {
+                gte: timeStampStart,
+                lte: timeStampEnd,
+              },
+            },
+            orderBy: {
+              TimeStamp: "asc",
+            },
+          });
+        } else {
+          response = await ctx.prisma.tradeHistory.findMany({
+            where: {
+              userId: ctx.session.user.id,
+            },
+            orderBy: {
+              TimeStamp: "asc",
+            },
+          });
+        }
+        if (!response) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Error Retrieving Trades",
+          });
+        }
+        const formattedTrades = response.map((trade) => {
+          const utcTimestamp = formatUtcTimestamp(trade.TimeStamp);
+
+          return {
+            ...trade,
+            TimeStamp: utcTimestamp,
+          };
+        });
+
+        return processDailyTrades(formattedTrades);
+      } catch (error) {
+        console.error("Error", error);
+        return [];
       }
     }),
 });

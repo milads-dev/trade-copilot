@@ -40,14 +40,14 @@ export const DetailsCard = ({ trades, isSuccess }: Props) => {
           <TradeDetails trades={trades} symbol={symbol} date={date} />
         )}
         {tagType === "notes" && (
-          <div className="mt-5 self-center">
+          <div className="mt-5 w-full self-center">
             <TradeNotes />
           </div>
         )}
       </div>
     </div>
   ) : (
-    <div className=" flex w-full items-center justify-center bg-base-200 ">
+    <div className=" flex h-full w-full items-center justify-center bg-base-200 ">
       <span className="loading loading-dots"></span>
     </div>
   );
