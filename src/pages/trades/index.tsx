@@ -45,6 +45,10 @@ const Trades = () => {
   };
 
   const trades = data?.pages.flatMap((page) => page?.trades ?? []);
+  const profitOrLoss = trades?.reduce(
+    (accum, currentTrade) => accum + currentTrade.Profit,
+    0
+  );
 
   return (
     <>
@@ -60,7 +64,7 @@ const Trades = () => {
           </div>
 
           <div className="relative my-9 flex w-full justify-between">
-            <button className="btn w-40" onClick={() => router.back()}>
+            <button className="btn w-40" onClick={() => void router.push("/")}>
               <ArrowLeft />
               Back
             </button>
@@ -96,6 +100,25 @@ const Trades = () => {
                 <span>No Trades Found</span>
               </div>
             )}
+            <div className="w=full text-center">
+              <div className="stats mt-5 bg-primary-content">
+                <div className="stat">
+                  <div className="stat-title">
+                    Total {profitOrLoss && profitOrLoss > 0 ? "Profit" : "Loss"}
+                  </div>
+                  <div className="stat-value">
+                    {profitOrLoss &&
+                      (profitOrLoss > 0 ? (
+                        <div className="text-primary">${profitOrLoss}</div>
+                      ) : (
+                        <div className="text-error">
+                          $({Math.abs(profitOrLoss).toFixed(2)})
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Drawer>
