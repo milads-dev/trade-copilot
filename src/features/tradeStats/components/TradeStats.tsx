@@ -1,17 +1,23 @@
 import React from "react";
 
+import { useRouter } from "next/router";
+
 import { ChartLineDown, ChartLineUp, HeartIcon } from "~/components/icons";
-import type { RouterOutputs } from "~/utils/api";
+import { api } from "~/utils/api";
 
 import { calculateTradeStats } from "../utils/helper";
 
-export type DailyTrades = RouterOutputs["trades"]["getStats"];
+export const TradeStats = () => {
+  const router = useRouter();
+  const startDate = router.query.from as string;
+  const endDate = router.query.to as string;
 
-interface Props {
-  data: DailyTrades | undefined;
-}
-
-export const TradeStats = ({ data }: Props) => {
+  const { data } = api.trades.getStats.useQuery(
+    { startDate, endDate },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
   const result = calculateTradeStats(data);
 
   return (

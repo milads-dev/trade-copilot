@@ -1,5 +1,7 @@
 import type { RouterOutputs } from "~/utils/api";
 
+import moment from "moment";
+
 export type DailyTrades = RouterOutputs["trades"]["getStats"];
 
 export const calculateTradeStats = (data: DailyTrades | undefined) => {
@@ -27,4 +29,28 @@ export const calculateTradeStats = (data: DailyTrades | undefined) => {
       totalLosses: 0,
     }
   );
+};
+
+export const generateTagQuery = (
+  startDate: string | null | undefined,
+  endDate: string | null | undefined
+): string => {
+  const formatStartDate = startDate
+    ? moment(startDate, "MM/DD/YYYY").format("YYYY-MM-DD")
+    : null;
+  const formatEndDate = endDate
+    ? moment(endDate, "MM/DD/YYYY").format("YYYY-MM-DD")
+    : null;
+
+  let query = `SELECT ttr."tagId", t."name" AS name, t."type", COUNT(ttr."tagId")::INTEGER AS count
+    FROM "TradeTagRelation" ttr 
+    JOIN "Tag" t ON ttr."tagId" = t."id"`;
+
+  if (formatStartDate && formatEndDate) {
+    query += ` WHERE ttr."date" BETWEEN '${formatStartDate}' AND '${formatEndDate}'`;
+  }
+
+  query += ' GROUP BY ttr."tagId", t."name", t."type" ';
+
+  return query;
 };
