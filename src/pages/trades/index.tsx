@@ -45,10 +45,6 @@ const Trades = () => {
   };
 
   const trades = data?.pages.flatMap((page) => page?.trades ?? []);
-  const profitOrLoss = trades?.reduce(
-    (accum, currentTrade) => accum + currentTrade.Profit,
-    0
-  );
 
   return (
     <>
@@ -100,25 +96,6 @@ const Trades = () => {
                 <span>No Trades Found</span>
               </div>
             )}
-            <div className="w=full text-center">
-              <div className="stats mt-5 bg-primary-content">
-                <div className="stat">
-                  <div className="stat-title">
-                    Total {profitOrLoss && profitOrLoss > 0 ? "Profit" : "Loss"}
-                  </div>
-                  <div className="stat-value">
-                    {profitOrLoss &&
-                      (profitOrLoss > 0 ? (
-                        <div className="text-primary">${profitOrLoss}</div>
-                      ) : (
-                        <div className="text-error">
-                          $({Math.abs(profitOrLoss).toFixed(2)})
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </Drawer>
