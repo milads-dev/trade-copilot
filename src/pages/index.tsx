@@ -10,6 +10,7 @@ import {
   DateRangeSchema,
   generateDateRangeUrl,
 } from "~/features/tradeHistory";
+import { TagStats, TradeStats } from "~/features/tradeStats";
 
 export default function Home() {
   const router = useRouter();
@@ -36,7 +37,17 @@ export default function Home() {
             <div className="relative my-3 flex self-end">
               <DateRangeButton passDateChange={handleDateChange} />
             </div>
-            <TradeCalendar />
+            <div className="lg:flex lg:justify-between">
+              <TagStats />
+              <div className="flex flex-col">
+                <div className="mb-4">
+                  <TradeStats />
+                </div>
+                <div className="mb-4 text-center">
+                  <TradeCalendar />
+                </div>
+              </div>
+            </div>
           </div>
         </Drawer>
       </main>

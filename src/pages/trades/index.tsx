@@ -60,7 +60,7 @@ const Trades = () => {
           </div>
 
           <div className="relative my-9 flex w-full justify-between">
-            <button className="btn w-40" onClick={() => router.back()}>
+            <button className="btn w-40" onClick={() => void router.push("/")}>
               <ArrowLeft />
               Back
             </button>
