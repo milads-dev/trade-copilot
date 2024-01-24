@@ -18,7 +18,8 @@ export const TradeStats = () => {
       refetchOnWindowFocus: false,
     }
   );
-  const result = calculateTradeStats(data);
+  const tradeStats = data?.tradeStats ?? [];
+  const result = calculateTradeStats(tradeStats);
 
   return (
     <div className="stats stats-vertical w-[35rem] self-end bg-base-200 md:stats-horizontal  md:w-[70rem]">
@@ -45,11 +46,11 @@ export const TradeStats = () => {
               {result?.totalProfitOrLoss.toFixed(2)}
             </div>
             <div className="stat-desc">
-              {data?.length === 0
+              {tradeStats?.length === 0
                 ? "N/A"
-                : data?.length === 1
-                ? `${data?.length} Trade`
-                : `${data?.length} Trades`}
+                : tradeStats?.length === 1
+                ? `${tradeStats?.length} Trade`
+                : `${tradeStats?.length} Trades`}
             </div>
           </>
         ) : (
@@ -62,9 +63,9 @@ export const TradeStats = () => {
           <span
             className="tooltip tooltip-left"
             data-tip={
-              result?.averageProfit && data?.length
+              result?.averageProfit && tradeStats?.length
                 ? `Total Profit ${(
-                    result?.averageProfit * data?.length
+                    result?.averageProfit * tradeStats?.length
                   ).toFixed(2)}`
                 : "N/A"
             }
@@ -96,10 +97,10 @@ export const TradeStats = () => {
           <span
             className="tooltip tooltip-left"
             data-tip={
-              result?.averageLoss && data?.length
-                ? `Total Loss ${(result?.averageLoss * data?.length).toFixed(
-                    2
-                  )}`
+              result?.averageLoss && tradeStats?.length
+                ? `Total Loss ${(
+                    result?.averageLoss * tradeStats?.length
+                  ).toFixed(2)}`
                 : "N/A"
             }
           >

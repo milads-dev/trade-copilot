@@ -40,7 +40,7 @@ export const TagStats = () => {
     <div className="mb-4 hidden text-center lg:mb-0 lg:ml-14 lg:mr-4 lg:block lg:self-start">
       <div className="px-5 text-center 2xl:w-full">
         <div className="flex justify-center">
-          <div className="tabs-boxed tabs w-[32rem] justify-around rounded-b-none">
+          <div className="tabs tabs-boxed w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
             {["setup", "mistake", "custom"].map((tab) => (
               <p
                 key={tab}
@@ -57,7 +57,7 @@ export const TagStats = () => {
 
         {isSuccess ? (
           <ul
-            className={`steps steps-vertical h-96 w-[32rem] overflow-scroll rounded-b-3xl bg-base-200 pl-5 pt-1 ${
+            className={`steps steps-vertical h-96 w-[24rem] overflow-scroll rounded-b-3xl bg-base-200 pl-5 pt-1 min-[1920px]:w-[36rem] ${
               sortedTags.length === 1 ? "items-start pt-5" : ""
             }`}
           >
@@ -68,7 +68,7 @@ export const TagStats = () => {
             ))}
           </ul>
         ) : (
-          <div className="flex h-96  w-[32rem] items-center justify-center rounded-b-3xl bg-base-200 pl-5 pt-1">
+          <div className="flex h-96  w-[24rem] items-center  justify-center rounded-b-3xl bg-base-200 pl-5 pt-1 min-[1920px]:w-[36rem]">
             <span className="loading loading-dots loading-md text-primary"></span>
           </div>
         )}

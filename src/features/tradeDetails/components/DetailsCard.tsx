@@ -48,7 +48,7 @@ export const DetailsCard = ({ trades, isSuccess }: Props) => {
     </div>
   ) : (
     <div className=" flex h-full w-full items-center justify-center bg-base-200 ">
-      <span className="loading loading-dots"></span>
+      <span className="loading loading-infinity loading-lg text-success"></span>
     </div>
   );
 };

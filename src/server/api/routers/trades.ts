@@ -336,17 +336,27 @@ export const tradesRouter = createTRPCRouter({
         }
         const formattedTrades = response.map((trade) => {
           const utcTimestamp = formatUtcTimestamp(trade.TimeStamp);
-
           return {
             ...trade,
             TimeStamp: utcTimestamp,
           };
         });
 
-        return processDailyTrades(formattedTrades);
+        const areaDataPnl = processDailyTrades(formattedTrades).map((trade) => {
+          const unixTime = formatToUnix(trade.openTimeStamp);
+          return {
+            value: trade.Profit,
+            time: unixTime,
+          };
+        });
+
+        return {
+          tradeStats: processDailyTrades(formattedTrades),
+          areaData: areaDataPnl,
+        };
       } catch (error) {
         console.error("Error", error);
-        return [];
+        return {};
       }
     }),
 });
