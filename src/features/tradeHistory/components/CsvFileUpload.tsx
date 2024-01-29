@@ -21,12 +21,7 @@ export const CsvFileUpload = () => {
   });
 
   const handleOnDrop = (input: CsvObject) => {
-    const { data, error } = input;
-    //TODO: Refactor Error Handling for UI
-    console.error(
-      "🚀 ~ file: csvFileUpload.tsx:19 ~ handleOnDrop ~ error:",
-      error
-    );
+    const { data } = input;
 
     const result = arrayCsvSchema.safeParse(getValidCsvData(data));
 

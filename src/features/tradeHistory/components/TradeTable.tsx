@@ -47,7 +47,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
             <th></th>
             <th>Symbol</th>
             <th>Date/Time</th>
-            <th>PnL</th>
+            <th className="pl-[3.25rem]">PnL</th>
             <th></th>
           </tr>
         </thead>

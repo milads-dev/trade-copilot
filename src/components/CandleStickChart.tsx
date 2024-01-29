@@ -41,7 +41,7 @@ export const CandleStickChart = () => {
         vertLines: { color: "#444" },
         horzLines: { color: "#444" },
       },
-
+      autoSize: true,
       width: 0,
       height: 690,
 
