@@ -1,5 +1,11 @@
 import { formatTradeTags } from "~/features/tradeDetails";
-import { generateTagQuery } from "~/features/tradeStats";
+import {
+  type Tag,
+  type TradeTag,
+  generateTagDateRangeQuery,
+  generateTagQuery,
+  sortTradeTags,
+} from "~/features/tradeStats";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 import { Prisma } from "@prisma/client";
@@ -7,12 +13,6 @@ import { TRPCError } from "@trpc/server";
 
 import { z } from "zod";
 
-interface Tag {
-  tagId: number;
-  name: string;
-  type: string;
-  count: number;
-}
 export const tagsRouter = createTRPCRouter({
   addTag: protectedProcedure
     .input(
@@ -179,9 +179,10 @@ export const tagsRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = input;
+      const userId = ctx.session.user.id;
 
       try {
-        const tagQuery = generateTagQuery(startDate, endDate);
+        const tagQuery = generateTagQuery(startDate, endDate, userId);
 
         const tags = await ctx.prisma.$queryRaw<Tag[]>(Prisma.sql([tagQuery]));
 
@@ -193,6 +194,44 @@ export const tagsRouter = createTRPCRouter({
 
         return {
           tags,
+        };
+      } catch (error) {
+        console.error("Error retrieving tag data:", error);
+        return {};
+      }
+    }),
+  getTagsByDateRange: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { startDate, endDate } = input;
+      const userId = ctx.session.user.id;
+
+      try {
+        const tagDateRangeQuery = generateTagDateRangeQuery(
+          startDate,
+          endDate,
+          userId
+        );
+
+        const tags = await ctx.prisma.$queryRaw<TradeTag[]>(
+          Prisma.sql([tagDateRangeQuery])
+        );
+
+        if (!tags)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Error Retrieving Tag data",
+          });
+
+        const sortedTags = sortTradeTags(tags);
+
+        return {
+          tags: sortedTags,
         };
       } catch (error) {
         console.error("Error retrieving tag data:", error);
