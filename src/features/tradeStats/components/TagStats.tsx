@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-
 import { useRouter } from "next/router";
 
+import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
+
+import { getTagClassName } from "../utils/helper";
 
 export const TagStats = () => {
   const router = useRouter();
@@ -14,13 +15,17 @@ export const TagStats = () => {
       refetchOnWindowFocus: false,
     }
   );
-  const [tagType, setTagType] = useState("setup");
+  const selectedTagType = useAppStore((state) => state.selectedTagType);
+  const updateTagType = useAppStore((state) => state.updateTagType);
+  const updateTagId = useAppStore((state) => state.updateTagId);
+
   const tags = data?.tags;
 
   const sortedTags = tags
     ? [...tags]
         .filter((tag) => {
-          return tag.type === tagType;
+          if (selectedTagType === "all") return tag;
+          return tag.type === selectedTagType;
         })
         .sort((a, b) => {
           if (b.count !== a.count) {
@@ -40,14 +45,14 @@ export const TagStats = () => {
     <div className="mb-4 hidden text-center lg:mb-0 lg:ml-14 lg:mr-4 lg:block lg:self-start">
       <div className="px-5 text-center 2xl:w-full">
         <div className="flex justify-center">
-          <div className="tabs-boxed tabs w-[32rem] justify-around rounded-b-none">
-            {["setup", "mistake", "custom"].map((tab) => (
+          <div className="tabs-boxed tabs w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
+            {["setup", "mistake", "custom", "all"].map((tab) => (
               <p
                 key={tab}
                 className={`tab  text-xs uppercase ${
-                  tagType === tab ? "tab-active" : ""
+                  selectedTagType === tab ? "tab-active" : ""
                 }`}
-                onClick={() => setTagType(tab)}
+                onClick={() => updateTagType(tab)}
               >
                 {tab}
               </p>
@@ -57,18 +62,30 @@ export const TagStats = () => {
 
         {isSuccess ? (
           <ul
-            className={`steps steps-vertical h-96 w-[32rem] overflow-scroll rounded-b-3xl bg-base-200 pl-5 pt-1 ${
+            className={`steps steps-vertical h-96 w-[24rem] overflow-scroll rounded-b-3xl bg-base-200 pl-5 pt-1 min-[1920px]:w-[36rem] ${
               sortedTags.length === 1 ? "items-start pt-5" : ""
             }`}
           >
             {sortedTags.map((tag) => (
-              <li key={tag.tagId} className={`step ${tagColors[tagType]}`}>
-                {tag.name} x {tag.count}
+              <li
+                key={tag.tagId}
+                className={`step ${tagColors[selectedTagType]}`}
+              >
+                <div
+                  className={`cursor-pointer ${getTagClassName(
+                    selectedTagType,
+                    tag.type
+                  )}`}
+                  onMouseEnter={() => updateTagId(tag.tagId)}
+                  onMouseLeave={() => updateTagId(null)}
+                >
+                  {tag.name} x {tag.count}
+                </div>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="flex h-96  w-[32rem] items-center justify-center rounded-b-3xl bg-base-200 pl-5 pt-1">
+          <div className="flex h-96  w-[24rem] items-center  justify-center rounded-b-3xl bg-base-200 pl-5 pt-1 min-[1920px]:w-[36rem]">
             <span className="loading loading-dots loading-md text-primary"></span>
           </div>
         )}

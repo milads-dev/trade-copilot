@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { Drawer } from "~/components/auth/Drawer";
+import { AreaLineChart } from "~/components/charts/AreaLineChart";
 import { TradeCalendar } from "~/features/tradeCalendar";
 import {
   DateRangeButton,
@@ -38,7 +39,10 @@ export default function Home() {
               <DateRangeButton passDateChange={handleDateChange} />
             </div>
             <div className="lg:flex lg:justify-between">
-              <TagStats />
+              <div>
+                <TagStats />
+                <AreaLineChart />
+              </div>
               <div className="flex flex-col">
                 <div className="mb-4">
                   <TradeStats />

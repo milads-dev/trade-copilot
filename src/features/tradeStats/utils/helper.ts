@@ -1,8 +1,13 @@
 import type { RouterOutputs } from "~/utils/api";
 
+import { type Time } from "lightweight-charts";
 import moment from "moment";
 
-export type DailyTrades = RouterOutputs["trades"]["getStats"];
+import { type TradeTag } from "../types";
+
+export type DailyTrades = RouterOutputs["trades"]["getStats"]["tradeStats"];
+export type AreaData = RouterOutputs["trades"]["getStats"]["areaData"];
+type Tags = RouterOutputs["tags"]["getTagsByDateRange"]["tags"];
 
 export const calculateTradeStats = (data: DailyTrades | undefined) => {
   return data?.reduce(
@@ -31,9 +36,26 @@ export const calculateTradeStats = (data: DailyTrades | undefined) => {
   );
 };
 
+export const calculateAreaChartLine = (data: AreaData) => {
+  let accumulatedPnL = 0;
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  return [
+    { value: 0, time: (data[0]!.time - 86400) as Time },
+    ...data.map((item) => {
+      accumulatedPnL += item.value;
+      return { value: accumulatedPnL, time: item.time as Time };
+    }),
+  ];
+};
+
 export const generateTagQuery = (
   startDate: string | null | undefined,
-  endDate: string | null | undefined
+  endDate: string | null | undefined,
+  userId: string
 ): string => {
   const formatStartDate = startDate
     ? moment(startDate, "MM/DD/YYYY").format("YYYY-MM-DD")
@@ -47,10 +69,75 @@ export const generateTagQuery = (
     JOIN "Tag" t ON ttr."tagId" = t."id"`;
 
   if (formatStartDate && formatEndDate) {
-    query += ` WHERE ttr."date" BETWEEN '${formatStartDate}' AND '${formatEndDate}'`;
+    query += ` WHERE ttr."date" BETWEEN '${formatStartDate}' AND '${formatEndDate}' 
+    AND  ttr."userId" = '${userId}'`;
+  } else {
+    query += `WHERE ttr."userId" = '${userId}'`;
   }
 
-  query += ' GROUP BY ttr."tagId", t."name", t."type" ';
+  query += 'GROUP BY ttr."tagId", t."name", t."type" ';
 
   return query;
+};
+
+export const generateTagDateRangeQuery = (
+  startDate: string,
+  endDate: string,
+  userId: string
+): string => {
+  const formatStartDate = moment(startDate, "MM/DD/YYYY").format("YYYY-MM-DD");
+  const formatEndDate = moment(endDate, "MM/DD/YYYY").format("YYYY-MM-DD");
+  const query = `SELECT ttr."date", t."name" AS name, t."type", t."id"
+FROM "TradeTagRelation" ttr 
+JOIN "Tag" t ON ttr."tagId" = t."id"
+WHERE ttr."date" BETWEEN '${formatStartDate}' AND '${formatEndDate}' 
+AND ttr."userId" = '${userId}'
+GROUP BY ttr."date", t."name", t."type",t."id"
+`;
+  return query;
+};
+
+const typeWeights: Record<string, number> = {
+  setup: 1,
+  mistake: 2,
+  custom: 3,
+};
+
+export const sortTradeTags = (tags: TradeTag[]) =>
+  tags.sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateA !== dateB) {
+      return dateA - dateB;
+    }
+    return (typeWeights[a.type] ?? 0) - (typeWeights[b.type] ?? 0);
+  });
+
+export const getTradeTags = (
+  tags: Tags,
+  index: number,
+  selectedTagType: string
+) => {
+  return tags?.filter((tag) =>
+    selectedTagType === "all"
+      ? index === new Date(tag.date).getDate()
+      : index === new Date(tag.date).getDate() && tag.type === selectedTagType
+  );
+};
+
+export const getTagClassName = (selectedTagType: string, tagType: string) => {
+  if (selectedTagType !== "all") {
+    return "";
+  }
+
+  switch (tagType) {
+    case "setup":
+      return "underline decoration-primary";
+    case "mistake":
+      return "underline decoration-error";
+    case "custom":
+      return "underline decoration-info";
+    default:
+      return "";
+  }
 };
