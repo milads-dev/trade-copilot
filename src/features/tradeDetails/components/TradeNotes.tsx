@@ -45,7 +45,7 @@ export const TradeNotes = () => {
   return (
     <div className="relative flex">
       {editorLoading && <TradeNoteSkeleton />}
-      <div className="z-10 w-full">
+      <div className="z-10 min-h-[480px] w-full">
         <form>
           <NoteEditor notes={notes} handleEditorUpdate={handleEditorUpdate} />
           <button

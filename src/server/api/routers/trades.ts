@@ -342,13 +342,15 @@ export const tradesRouter = createTRPCRouter({
           };
         });
 
-        const areaDataPnl = processDailyTrades(formattedTrades).map((trade) => {
-          const unixTime = formatToUnix(trade.openTimeStamp);
-          return {
-            value: trade.Profit,
-            time: unixTime,
-          };
-        });
+        const areaDataPnl = processDailyTrades(formattedTrades)
+          .map((trade) => {
+            const unixTime = formatToUnix(trade.openTimeStamp);
+            return {
+              value: trade.Profit,
+              time: unixTime,
+            };
+          })
+          .sort((a, b) => a.time - b.time);
 
         return {
           tradeStats: processDailyTrades(formattedTrades),
