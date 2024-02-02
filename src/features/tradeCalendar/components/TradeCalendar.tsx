@@ -1,36 +1,31 @@
 import React, { useState } from "react";
 
 import ArrowLeft from "~/components/icons/ArrowIcon";
+import { TagGroupAvatar, getTradeTags } from "~/features/tradeStats";
+import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
 
-import {
-  add,
-  differenceInDays,
-  endOfMonth,
-  format,
-  getDate,
-  getMonth,
-  startOfMonth,
-  sub,
-} from "date-fns";
-import moment from "moment";
+import { add, format, getDate, getMonth, sub } from "date-fns";
 
-import { DAYS_IN_A_WEEK, WEEK_EXCLUDING_TODAY } from "../constants";
+import { DAYS_IN_A_WEEK } from "../constants";
+import { calculateCalendarRange, formatDate } from "../utils/helper";
 import { Cell } from "./Cell";
 
 export const TradeCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const calendarStart = startOfMonth(currentDate);
-  const calendarEnd = endOfMonth(currentDate);
+  const { calendarStart, calendarEnd, numDays, prefixDays, suffixDays } =
+    calculateCalendarRange(currentDate);
 
-  const numDays = differenceInDays(calendarEnd, calendarStart) + 1;
-  const prefixDays = calendarStart.getDay();
+  const startDate = formatDate(calendarStart);
+  const endDate = formatDate(calendarEnd);
 
-  const suffixDays = WEEK_EXCLUDING_TODAY - calendarEnd.getDay();
-  const startDate = moment(calendarStart).format("MM/DD/YYYY");
-  const endDate = moment(calendarEnd).format("MM/DD/YYYY");
-
+  const { data: tagData } = api.tags.getTagsByDateRange.useQuery(
+    { startDate, endDate },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
   const { data } = api.trades.getTrades.useQuery(
     { startDate, endDate },
     {
@@ -38,6 +33,8 @@ export const TradeCalendar = () => {
     }
   );
   const trades = data?.trades ?? [];
+  const tags = tagData?.tags ?? [];
+  const selectedTagType = useAppStore((state) => state.selectedTagType);
 
   const prevMonth = () => setCurrentDate(sub(currentDate, { months: 1 }));
   const nextMonth = () => setCurrentDate(add(currentDate, { months: 1 }));
@@ -79,6 +76,7 @@ export const TradeCalendar = () => {
               const trade = trades.find(
                 (trade) => index + 1 === getDate(new Date(trade.openTimeStamp))
               );
+              const tradeTags = getTradeTags(tags, index, selectedTagType);
 
               if (trade) {
                 const highlightColor =
@@ -103,6 +101,7 @@ export const TradeCalendar = () => {
                     <span className="ml-9 w-full text-right">
                       {trade.Profit}
                     </span>
+                    <TagGroupAvatar tradeTags={tradeTags} />
                   </Cell>
                 );
               } else {
