@@ -39,7 +39,7 @@ export default function Home() {
               <DateRangeButton passDateChange={handleDateChange} />
             </div>
             <div className="lg:flex lg:justify-between">
-              <div>
+              <div className="hidden lg:block">
                 <TagStats />
                 <AreaLineChart />
               </div>

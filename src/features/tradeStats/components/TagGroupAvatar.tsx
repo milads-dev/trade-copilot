@@ -25,7 +25,7 @@ export const TagGroupAvatar = ({ tradeTags }: { tradeTags: Tags }) => {
     visibleTags &&
     visibleTags.length > 0 && (
       <div
-        className={`tooltip tooltip-bottom absolute mt-16 ${
+        className={`tooltip tooltip-bottom absolute mt-16 hidden lg:block ${
           isTagIdSelected && "animate-bounce"
         } `}
         data-tip={tradeTags?.map((tag, index) => ` ${index + 1}.${tag.name}`)}

@@ -4,14 +4,10 @@ import Link from "next/link";
 
 import moment from "moment";
 
-type DailyTrade = {
-  Symbol: string;
-  Profit: number;
-  openTimeStamp: string;
-  closeTimeStamp: string | null;
-};
+import type { TradeDetailsData } from "../types";
+
 interface Props {
-  trades: DailyTrade[] | undefined;
+  trades: TradeDetailsData[] | undefined;
   handleNextTrades: () => Promise<void>;
 }
 

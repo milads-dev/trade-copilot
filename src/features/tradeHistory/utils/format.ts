@@ -1,6 +1,7 @@
 import moment from "moment";
 
 import {
+  type TradeDetailsData,
   type dataBaseTradeArrayType,
   ibkrCsvSchema,
   metaTraderCsvSchema,
@@ -48,40 +49,34 @@ const formatIbkrData = (tradeRow: typeof ibkrCsvSchema) => {
   };
 };
 
-type DailyTrade = {
-  Symbol: string;
-  Profit: number;
-  openTimeStamp: string;
-  closeTimeStamp: string | null;
-};
-
 export const processDailyTrades = (trades: dataBaseTradeArrayType) => {
   const sortedTrades = sortTradesByDayAndSymbol(trades);
 
-  return sortedTrades.reduce<DailyTrade[]>((dailyTrades, currentTrade) => {
-    const { Symbol, Profit, TimeStamp } = currentTrade;
-    const lastTrade = dailyTrades[dailyTrades.length - 1];
+  return sortedTrades.reduce<TradeDetailsData[]>(
+    (dailyTrades, currentTrade) => {
+      const { Symbol, Profit, TimeStamp } = currentTrade;
+      const lastTrade = dailyTrades[dailyTrades.length - 1];
 
-    if (
-      !lastTrade ||
-      lastTrade.Symbol !== Symbol ||
-      !lastTrade.openTimeStamp?.startsWith(TimeStamp.substring(0, 10))
-    ) {
-      // Add a new trade
-      dailyTrades.push({
-        Symbol,
-        Profit,
-        openTimeStamp: TimeStamp,
-        closeTimeStamp: null,
-      });
-    } else {
-      // Update the existing trade
-      lastTrade.Profit += Profit;
-      lastTrade.closeTimeStamp = TimeStamp;
-    }
+      if (
+        !lastTrade ||
+        lastTrade.Symbol !== Symbol ||
+        !lastTrade.openTimeStamp?.startsWith(TimeStamp.substring(0, 10))
+      ) {
+        dailyTrades.push({
+          Symbol,
+          Profit,
+          openTimeStamp: TimeStamp,
+          closeTimeStamp: null,
+        });
+      } else {
+        lastTrade.Profit += Profit;
+        lastTrade.closeTimeStamp = TimeStamp;
+      }
 
-    return dailyTrades;
-  }, []);
+      return dailyTrades;
+    },
+    []
+  );
 };
 
 export const formatUtcTimestamp = (timestamp: string | Date) => {
@@ -103,13 +98,14 @@ const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {
     const aDate = moment(a.TimeStamp);
     const bDate = moment(b.TimeStamp);
 
-    if (aDate.isSame(bDate, "month")) {
-      if (aDate.isSame(bDate, "day")) {
-        return a.Symbol.localeCompare(b.Symbol);
-      } else {
-        return aDate.date() - bDate.date();
-      }
-    }
+    // This might still be needed TBD
+    // if (aDate.isSame(bDate, "month")) {
+    //   if (aDate.isSame(bDate, "day")) {
+    //     return a.Symbol.localeCompare(b.Symbol);
+    //   } else {
+    //     return aDate.date() - bDate.date();
+    //   }
+    // }
     return aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
   });
 };
