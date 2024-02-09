@@ -19,7 +19,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
 
       const handleScroll = () => {
         if (
-          container.scrollTop + container.clientHeight >=
+          container.scrollTop + container.clientHeight + 10 >=
           container.scrollHeight
         ) {
           void handleNextTrades();
@@ -36,7 +36,12 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
   }, []);
 
   return (
-    <div className="max-h-[48rem]  overflow-y-scroll" ref={tableRef}>
+    <div
+      className={`${
+        trades!.length > 8 ? "max-h-[48rem]" : "max-h-[28rem]"
+      }    overflow-y-scroll`}
+      ref={tableRef}
+    >
       <table className="table table-zebra  table-pin-rows table-lg flex  bg-primary-content">
         <thead>
           <tr>
