@@ -43,12 +43,23 @@ export const tagsRouter = createTRPCRouter({
           },
         });
         if (tag) {
+          const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+            where: { symbol, date },
+            select: { id: true },
+          });
+
+          if (!tradeDetails)
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "No Trade Details",
+            });
           await ctx.prisma.tradeTagRelation.create({
             data: {
               tagId: tag.id,
               userId: ctx.session.user.id,
               symbol,
               date,
+              tradeId: tradeDetails.id,
             },
           });
         }
@@ -157,12 +168,24 @@ export const tagsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, symbol, date } = input;
       try {
+        const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+          where: { symbol, date },
+          select: { id: true },
+        });
+
+        if (!tradeDetails)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No Trade Details",
+          });
+
         const tradeTag = await ctx.prisma.tradeTagRelation.create({
           data: {
             tagId: id,
             userId: ctx.session.user.id,
             symbol,
             date,
+            tradeId: tradeDetails.id,
           },
         });
         return tradeTag;
