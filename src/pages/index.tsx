@@ -11,7 +11,7 @@ import {
   DateRangeSchema,
   generateDateRangeUrl,
 } from "~/features/tradeHistory";
-import { TagStats, TradeStats } from "~/features/tradeStats";
+import { TagStats, TradePnlStats } from "~/features/tradeStats";
 
 export default function Home() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col">
                 <div className="mb-4">
-                  <TradeStats />
+                  <TradePnlStats />
                 </div>
                 <div className="mb-4 text-center">
                   <TradeCalendar />

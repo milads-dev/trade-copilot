@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 
 import { calculateTradeStats } from "../utils/helper";
 
-export const TradeStats = () => {
+export const TradePnlStats = () => {
   const router = useRouter();
   const startDate = router.query.from as string;
   const endDate = router.query.to as string;
