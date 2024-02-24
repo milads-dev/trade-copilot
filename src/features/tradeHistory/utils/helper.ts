@@ -2,6 +2,9 @@ import { type Prisma, type PrismaClient } from "@prisma/client";
 import { type DefaultArgs } from "@prisma/client/runtime/library";
 
 import moment from "moment";
+import qs from "qs";
+
+import { getDateRangeTimestamps } from "./format";
 
 type Context = {
   session: {
@@ -58,22 +61,170 @@ export const fetchTradeCount = async (
 
 export const generateDateRangeUrl = (
   currentUrl: string,
-  start: Date | null,
-  end?: Date | null
+  startDate: Date | null,
+  endDate?: Date | null,
+  filter?: string | null
 ): string => {
-  let newUrl;
+  const queryObject: { from?: string; to?: string; filter?: string } = {};
 
-  if (start && end) {
-    const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
-    const formatEnd = end ? moment(end).format("MM/DD/YYYY") : "";
-    newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
-  } else if (start) {
-    const formatStart = start ? moment(start).format("MM/DD/YYYY") : "";
-    const formatEnd = start ? moment(start).format("MM/DD/YYYY") : "";
-    newUrl = `${currentUrl}?from=${formatStart}&to=${formatEnd}`;
-  } else {
-    newUrl = `${currentUrl}`;
+  if (startDate) {
+    const formattedStart = moment(startDate).format("MM/DD/YYYY");
+    queryObject.from = formattedStart;
+    queryObject.to = formattedStart;
   }
 
+  if (endDate) {
+    queryObject.to = moment(endDate).format("MM/DD/YYYY");
+  }
+
+  if (filter) {
+    queryObject.filter = filter;
+  }
+
+  // Package itself allows for type (any) which conflicts with eslint
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const queryString = qs.stringify(queryObject);
+
+  const separator = currentUrl.includes("?") ? "&" : "?";
+  const newUrl = queryString
+    ? `${currentUrl}${separator}${queryString}`
+    : currentUrl;
+
   return newUrl;
+};
+
+export const fetchTradesByFilter = async (
+  ctx: Context,
+  filterTag: string,
+  startDate: string | null | undefined,
+  endDate: string | null | undefined
+) => {
+  const tradesByTagId = await ctx.prisma.tradeTagRelation.findMany({
+    where: {
+      userId: ctx.session.user.id,
+      tagId: parseFloat(filterTag),
+    },
+  });
+  let response;
+  if (typeof startDate === "string" && typeof endDate === "string") {
+    const filteredData = tradesByTagId
+      .filter((item) => {
+        const itemDate = moment(item.date);
+        const startDateMoment = moment(startDate);
+        const endDateMoment = moment(endDate);
+
+        return (
+          itemDate.isSameOrAfter(startDateMoment) &&
+          itemDate.isSameOrBefore(endDateMoment)
+        );
+      })
+      .map((item) => item.tradeId);
+    response = await ctx.prisma.tradeHistory.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        tradeDetailsId: {
+          in: filteredData,
+        },
+      },
+      orderBy: {
+        TimeStamp: "asc",
+      },
+    });
+  } else {
+    const filteredData = tradesByTagId.map((item) => item.tradeId);
+    response = await ctx.prisma.tradeHistory.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        tradeDetailsId: {
+          in: filteredData,
+        },
+      },
+      orderBy: {
+        TimeStamp: "asc",
+      },
+    });
+  }
+
+  return response;
+};
+
+export const fetchTradesByDateRange = async (
+  ctx: Context,
+  startDate: string,
+  endDate: string
+) => {
+  const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
+    startDate,
+    endDate
+  );
+
+  const response = await ctx.prisma.tradeHistory.findMany({
+    where: {
+      userId: ctx.session.user.id,
+      TimeStamp: {
+        gte: timeStampStart,
+        lte: timeStampEnd,
+      },
+    },
+    orderBy: {
+      TimeStamp: "asc",
+    },
+  });
+
+  return response;
+};
+
+type NextCursor =
+  | {
+      id?: number | null | undefined;
+      date?: Date | null | undefined;
+    }
+  | undefined;
+
+export const fetchTradeDataToInfinity = async (
+  ctx: Context,
+  userId: string,
+  cursor?: { id?: number | null; date?: Date | null }
+) => {
+  let nextCursor: NextCursor;
+
+  const weeklyTradeCount = await fetchTradeCount(ctx, userId, cursor?.date);
+
+  const lastTradeId = await ctx.prisma.tradeHistory.findFirst({
+    select: {
+      id: true,
+    },
+    orderBy: {
+      TimeStamp: "desc",
+    },
+  });
+
+  const response = await ctx.prisma.tradeHistory.findMany({
+    take: weeklyTradeCount + 1,
+    cursor: cursor
+      ? {
+          TimeStamp: cursor.date ?? undefined,
+          id: cursor.id ?? undefined,
+        }
+      : undefined,
+    where: {
+      userId: ctx.session.user.id,
+    },
+    orderBy: {
+      TimeStamp: "asc",
+    },
+  });
+
+  const nextTradeId = response[weeklyTradeCount - 1]?.id ?? weeklyTradeCount;
+
+  if (lastTradeId!.id !== nextTradeId) {
+    const nextTrade = response.pop();
+
+    nextCursor = {
+      id: nextTrade?.id,
+      date: nextTrade?.TimeStamp,
+    };
+  }
+
+  return { response, nextCursor };
 };
