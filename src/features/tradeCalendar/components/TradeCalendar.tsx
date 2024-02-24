@@ -95,7 +95,9 @@ export const TradeCalendar = () => {
                     >
                       {index + 1}
                     </span>
-                    <span className="ml-9 w-full text-right">{profit}</span>
+                    <span className="ml-9 w-full text-right">
+                      {profit.toFixed(2)}
+                    </span>
                     <TagGroupAvatar tradeTags={tradeTags} />
                   </Cell>
                 );
