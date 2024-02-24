@@ -61,7 +61,9 @@ export const TradeDetails = ({ trades, symbol, date }: Props) => {
         <div className="card-title">PnL Realized:</div>
         {tradePnL &&
           (tradePnL > 0 ? (
-            <span className="card-title text-success">${tradePnL}</span>
+            <span className="card-title text-success">
+              ${tradePnL.toFixed(2)}
+            </span>
           ) : (
             <span className="card-title  text-error">
               $({Math.abs(tradePnL).toFixed(2)})

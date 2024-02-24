@@ -1,4 +1,4 @@
-export * from "./components/TradeStats";
+export * from "./components/TradePnlStats";
 export * from "./components/TagStats";
 export * from "./components/TagGroupAvatar";
 

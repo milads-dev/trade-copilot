@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { useRouter } from "next/router";
+
+import { useAppStore } from "~/hooks/useAppStore";
 
 import type { DailyTrades } from "../type";
 import { TradeDetails } from "./TradeDetails";
@@ -16,7 +18,8 @@ export const DetailsCard = ({ trades, isSuccess }: Props) => {
 
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
-  const [tagType, setTagType] = useState("details");
+  const selectedTagType = useAppStore((state) => state.selectedTagType);
+  const updateTagType = useAppStore((state) => state.updateTagType);
 
   return isSuccess ? (
     <div className="card mr-10 w-full bg-base-200 pr-5">
@@ -27,19 +30,19 @@ export const DetailsCard = ({ trades, isSuccess }: Props) => {
               <p
                 key={tab}
                 className={`tab tab-bordered uppercase ${
-                  tagType === tab ? "tab-active" : ""
+                  selectedTagType === tab ? "tab-active" : ""
                 }`}
-                onClick={() => setTagType(tab)}
+                onClick={() => updateTagType(tab)}
               >
                 {tab}
               </p>
             ))}
           </div>
         </div>
-        {tagType === "details" && (
+        {selectedTagType === "details" && (
           <TradeDetails trades={trades} symbol={symbol} date={date} />
         )}
-        {tagType === "notes" && (
+        {selectedTagType === "notes" && (
           <div className="mt-5 w-full self-center">
             <TradeNotes />
           </div>

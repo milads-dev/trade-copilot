@@ -43,12 +43,23 @@ export const tagsRouter = createTRPCRouter({
           },
         });
         if (tag) {
+          const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+            where: { symbol, date },
+            select: { id: true },
+          });
+
+          if (!tradeDetails)
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "No Trade Details",
+            });
           await ctx.prisma.tradeTagRelation.create({
             data: {
               tagId: tag.id,
               userId: ctx.session.user.id,
               symbol,
               date,
+              tradeId: tradeDetails.id,
             },
           });
         }
@@ -106,6 +117,47 @@ export const tagsRouter = createTRPCRouter({
         return {};
       }
     }),
+  getTagsByFilter: protectedProcedure
+    .input(z.string().optional())
+    .query(async ({ ctx, input }) => {
+      try {
+        if (input === undefined) {
+          const tags = await ctx.prisma.tag.findMany({
+            where: {
+              userId: ctx.session.user.id,
+            },
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          });
+          return {
+            tags: tags,
+            tagName: "",
+          };
+        } else {
+          const tag = await ctx.prisma.tag.findFirst({
+            where: {
+              userId: ctx.session.user.id,
+              id: parseInt(input),
+            },
+            select: { name: true },
+          });
+
+          return {
+            tagName: tag?.name,
+            tags: [],
+          };
+        }
+      } catch (error) {
+        console.error("Error retrieving trades:", error);
+        return {
+          tagName: "",
+          tags: [],
+        };
+      }
+    }),
   removeTag: protectedProcedure
     .input(
       z.object({
@@ -157,12 +209,24 @@ export const tagsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, symbol, date } = input;
       try {
+        const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
+          where: { symbol, date },
+          select: { id: true },
+        });
+
+        if (!tradeDetails)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No Trade Details",
+          });
+
         const tradeTag = await ctx.prisma.tradeTagRelation.create({
           data: {
             tagId: id,
             userId: ctx.session.user.id,
             symbol,
             date,
+            tradeId: tradeDetails.id,
           },
         });
         return tradeTag;

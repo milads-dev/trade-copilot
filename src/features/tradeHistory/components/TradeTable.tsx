@@ -2,20 +2,20 @@ import React, { useEffect, useRef } from "react";
 
 import Link from "next/link";
 
+import { useAppStore } from "~/hooks/useAppStore";
+
 import moment from "moment";
 
-type DailyTrade = {
-  Symbol: string;
-  Profit: number;
-  openTimeStamp: string;
-  closeTimeStamp: string | null;
-};
+import type { TradeDetailsData } from "../types";
+
 interface Props {
-  trades: DailyTrade[] | undefined;
+  trades: TradeDetailsData[] | undefined;
   handleNextTrades: () => Promise<void>;
 }
 
 export const TradeTable = ({ trades, handleNextTrades }: Props) => {
+  const updateTagType = useAppStore((state) => state.updateTagType);
+
   const tableRef = useRef<HTMLTableElement | null>(null);
   useEffect(() => {
     if (tableRef.current) {
@@ -23,7 +23,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
 
       const handleScroll = () => {
         if (
-          container.scrollTop + container.clientHeight >=
+          container.scrollTop + container.clientHeight + 10 >=
           container.scrollHeight
         ) {
           void handleNextTrades();
@@ -40,7 +40,12 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
   }, []);
 
   return (
-    <div className="max-h-[48rem]  overflow-y-scroll" ref={tableRef}>
+    <div
+      className={`${
+        trades!.length > 8 ? "max-h-[48rem]" : "max-h-[28rem]"
+      }    overflow-y-scroll`}
+      ref={tableRef}
+    >
       <table className="table table-zebra  table-pin-rows table-lg flex  bg-primary-content">
         <thead>
           <tr>
@@ -72,12 +77,13 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
                       Profit > 0 ? "badge-success" : "badge-error"
                     }`}
                   >
-                    ${Math.abs(Profit)}
+                    ${Math.abs(Profit).toFixed(2)}
                   </span>
                 </td>
                 <td>
                   <button className="btn btn-ghost btn-xs">
                     <Link
+                      onClick={() => updateTagType("details")}
                       href={{
                         pathname: `/trades/${Symbol}`,
                         query: {

@@ -37,3 +37,10 @@ export const arrayCsvSchema = z.array(generalCsvSchema);
 export const dataBaseTradeArraySchema = z.array(dataBaseTradeSchema);
 
 export type dataBaseTradeArrayType = z.infer<typeof dataBaseTradeArraySchema>;
+
+export type TradeDetailsData = {
+  Symbol: string;
+  Profit: number;
+  openTimeStamp: string;
+  closeTimeStamp: string | null;
+};

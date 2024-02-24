@@ -8,9 +8,10 @@ import {
 import {
   dataBaseTradeArraySchema,
   type dataBaseTradeArrayType,
-  fetchTradeCount,
+  fetchTradeDataToInfinity,
+  fetchTradesByDateRange,
+  fetchTradesByFilter,
   formatUtcTimestamp,
-  getDateRangeTimestamps,
   processDailyTrades,
 } from "~/features/tradeHistory";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -51,10 +52,11 @@ export const tradesRouter = createTRPCRouter({
           .nullish(),
         startDate: z.string().nullish(),
         endDate: z.string().nullish(),
+        filterTag: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { cursor, startDate, endDate } = input;
+      const { cursor, startDate, endDate, filterTag } = input;
 
       const userId = ctx.session.user.id;
 
@@ -62,67 +64,20 @@ export const tradesRouter = createTRPCRouter({
         let response;
         let nextCursor: typeof cursor | undefined = undefined;
 
-        if (typeof startDate === "string" && typeof endDate === "string") {
-          const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
+        if (filterTag) {
+          response = await fetchTradesByFilter(
+            ctx,
+            filterTag,
             startDate,
             endDate
           );
-
-          response = await ctx.prisma.tradeHistory.findMany({
-            where: {
-              userId: ctx.session.user.id,
-              TimeStamp: {
-                gte: timeStampStart,
-                lte: timeStampEnd,
-              },
-            },
-            orderBy: {
-              TimeStamp: "asc",
-            },
-          });
+        } else if (startDate && endDate) {
+          response = await fetchTradesByDateRange(ctx, startDate, endDate);
         } else {
-          const weeklyTradeCount = await fetchTradeCount(
-            ctx,
-            userId,
-            cursor?.date
-          );
-
-          const lastTradeId = await ctx.prisma.tradeHistory.findFirst({
-            select: {
-              id: true,
-            },
-            orderBy: {
-              TimeStamp: "desc",
-            },
-          });
-
-          response = await ctx.prisma.tradeHistory.findMany({
-            take: weeklyTradeCount + 1,
-            cursor: cursor
-              ? {
-                  TimeStamp: cursor.date ?? undefined,
-                  id: cursor.id ?? undefined,
-                }
-              : undefined,
-            where: {
-              userId: ctx.session.user.id,
-            },
-            orderBy: {
-              TimeStamp: "asc",
-            },
-          });
-
-          const nextTradeId =
-            response[weeklyTradeCount - 1]?.id ?? weeklyTradeCount;
-
-          if (lastTradeId!.id !== nextTradeId) {
-            const nextTrade = response.pop();
-
-            nextCursor = {
-              id: nextTrade?.id,
-              date: nextTrade?.TimeStamp,
-            };
-          }
+          const { response: infiniteResponse, nextCursor: infiniteCursor } =
+            await fetchTradeDataToInfinity(ctx, userId, cursor!);
+          response = infiniteResponse;
+          nextCursor = infiniteCursor;
         }
 
         const formattedTrades = response.map((trade) => {
@@ -137,6 +92,7 @@ export const tradesRouter = createTRPCRouter({
         return { trades: processDailyTrades(formattedTrades), nextCursor };
       } catch (error) {
         console.error("Error retrieving trades:", error);
+        throw new Error("Failed to retrieve trades.");
       }
     }),
 
@@ -301,23 +257,7 @@ export const tradesRouter = createTRPCRouter({
         let response;
 
         if (typeof startDate === "string" && typeof endDate === "string") {
-          const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
-            startDate,
-            endDate
-          );
-
-          response = await ctx.prisma.tradeHistory.findMany({
-            where: {
-              userId: ctx.session.user.id,
-              TimeStamp: {
-                gte: timeStampStart,
-                lte: timeStampEnd,
-              },
-            },
-            orderBy: {
-              TimeStamp: "asc",
-            },
-          });
+          response = await fetchTradesByDateRange(ctx, startDate, endDate);
         } else {
           response = await ctx.prisma.tradeHistory.findMany({
             where: {

@@ -84,10 +84,10 @@ export const AreaLineChart = () => {
           const { value } = data as { value: number };
           if (toolTipRef.current) {
             if (value > 0) {
-              toolTipRef.current.innerText = `$${value}`;
+              toolTipRef.current.innerText = `$${value.toFixed(2)}`;
               toolTipRef.current.style.color = "green";
             } else if (value < 0) {
-              toolTipRef.current.innerText = `$(${Math.abs(value)})`;
+              toolTipRef.current.innerText = `$(${Math.abs(value).toFixed(2)})`;
               toolTipRef.current.style.color = "red";
             } else {
               toolTipRef.current.innerText = `$${value}`;

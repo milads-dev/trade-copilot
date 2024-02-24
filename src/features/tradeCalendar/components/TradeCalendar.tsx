@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 
 import ArrowLeft from "~/components/icons/ArrowIcon";
-import { TagGroupAvatar, getTradeTags } from "~/features/tradeStats";
+import {
+  TagGroupAvatar,
+  getTradeTags,
+  processCalendarTrades,
+} from "~/features/tradeStats";
 import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
 
@@ -73,24 +77,17 @@ export const TradeCalendar = () => {
             ))}
 
             {Array.from({ length: numDays }).map((_, index) => {
-              const trade = trades.find(
+              const dailyTrades = trades.filter(
                 (trade) => index + 1 === getDate(new Date(trade.openTimeStamp))
               );
-              const tradeTags = getTradeTags(tags, index, selectedTagType);
 
-              if (trade) {
-                const highlightColor =
-                  trade.Profit > 0
-                    ? "bg-success-content"
-                    : trade.Profit < 0
-                    ? "bg-error-content"
-                    : "";
+              if (dailyTrades.length > 0) {
+                const { highlightColor, date, profit } =
+                  processCalendarTrades(dailyTrades);
+                const tradeTags = getTradeTags(tags, selectedTagType, date);
+
                 return (
-                  <Cell
-                    key={index}
-                    highlightColor={highlightColor}
-                    date={new Date(trade.openTimeStamp)}
-                  >
+                  <Cell key={index} highlightColor={highlightColor} date={date}>
                     <span
                       className={`${
                         isCurrentDay(index + 1) ? "underline" : ""
@@ -99,7 +96,7 @@ export const TradeCalendar = () => {
                       {index + 1}
                     </span>
                     <span className="ml-9 w-full text-right">
-                      {trade.Profit}
+                      {profit.toFixed(2)}
                     </span>
                     <TagGroupAvatar tradeTags={tradeTags} />
                   </Cell>

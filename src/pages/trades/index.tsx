@@ -1,3 +1,4 @@
+import React from "react";
 import "react-calendar/dist/Calendar.css";
 
 import { type GetServerSidePropsContext } from "next";
@@ -7,24 +8,18 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { Drawer } from "~/components/auth/Drawer";
-import ArrowLeft from "~/components/icons/ArrowIcon";
-import {
-  CsvFileUpload,
-  DateRangeButton,
-  DateRangeSchema,
-  TradeTable,
-  generateDateRangeUrl,
-} from "~/features/tradeHistory";
+import { TradeHistoryMenu, TradeTable } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
 
 const Trades = () => {
   const router = useRouter();
   const startDate = router.query.from as string;
   const endDate = router.query.to as string;
+  const filterTag = router.query.filter as string;
 
   const { data, isLoading, fetchNextPage } =
     api.trades.getTrades.useInfiniteQuery(
-      { startDate, endDate },
+      { startDate, endDate, filterTag },
       {
         getNextPageParam: (lastPage) => lastPage?.nextCursor,
         refetchOnWindowFocus: false,
@@ -33,15 +28,6 @@ const Trades = () => {
 
   const handleNextTrades = async () => {
     await fetchNextPage();
-  };
-
-  const handleDateChange = (dates: unknown) => {
-    const currentUrl = router.pathname;
-    const [start, end] = DateRangeSchema.parse(dates);
-
-    const newUrl = generateDateRangeUrl(currentUrl, start, end);
-
-    void router.replace(newUrl, undefined, { shallow: true });
   };
 
   const trades = data?.pages.flatMap((page) => page?.trades ?? []);
@@ -55,17 +41,7 @@ const Trades = () => {
       </Head>
       <Drawer>
         <div className="flex min-h-screen flex-col p-10">
-          <div className="mb-5 flex self-end">
-            <CsvFileUpload />
-          </div>
-
-          <div className="relative my-9 flex w-full justify-between">
-            <button className="btn w-40" onClick={() => void router.push("/")}>
-              <ArrowLeft />
-              Back
-            </button>
-            <DateRangeButton passDateChange={handleDateChange} />
-          </div>
+          <TradeHistoryMenu />
 
           <div className="mx-auto h-[48rem] w-full overflow-x-auto">
             {isLoading ? (

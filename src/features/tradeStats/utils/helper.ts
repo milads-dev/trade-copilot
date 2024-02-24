@@ -5,11 +5,11 @@ import moment from "moment";
 
 import { type TradeTag } from "../types";
 
-export type DailyTrades = RouterOutputs["trades"]["getStats"]["tradeStats"];
+export type TradeStats = RouterOutputs["trades"]["getStats"]["tradeStats"];
 export type AreaData = RouterOutputs["trades"]["getStats"]["areaData"];
 type Tags = RouterOutputs["tags"]["getTagsByDateRange"]["tags"];
 
-export const calculateTradeStats = (data: DailyTrades | undefined) => {
+export const calculateTradeStats = (data: TradeStats | undefined) => {
   return data?.reduce(
     (accumulator, trade, currentIndex) => {
       accumulator.totalProfitOrLoss += trade.Profit;
@@ -113,15 +113,52 @@ export const sortTradeTags = (tags: TradeTag[]) =>
     return (typeWeights[a.type] ?? 0) - (typeWeights[b.type] ?? 0);
   });
 
+export const processCalendarTrades = (trades: TradeStats) => {
+  const sortedTrades = trades!.sort(
+    (a, b) =>
+      new Date(a.openTimeStamp).getTime() - new Date(b.openTimeStamp).getTime()
+  );
+
+  const totalProfit = sortedTrades.reduce(
+    (accumulatedProfit, trade) => accumulatedProfit + trade.Profit,
+    0
+  );
+
+  const firstTradeDate =
+    sortedTrades.length > 0
+      ? new Date(sortedTrades[0]!.openTimeStamp)
+      : undefined;
+
+  const highlightColor =
+    totalProfit > 0
+      ? "bg-success-content"
+      : totalProfit < 0
+      ? "bg-error-content"
+      : "";
+
+  return {
+    highlightColor,
+    date: firstTradeDate,
+    profit: totalProfit,
+  };
+};
+
+const formatDate = (inputDate: Date | string) => {
+  const date = new Date(inputDate);
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+};
 export const getTradeTags = (
   tags: Tags,
-  index: number,
-  selectedTagType: string
+  selectedTagType: string,
+  date?: Date
 ) => {
   return tags?.filter((tag) =>
     selectedTagType === "all"
-      ? index === new Date(tag.date).getDate()
-      : index === new Date(tag.date).getDate() && tag.type === selectedTagType
+      ? formatDate(date!).getTime() === formatDate(tag.date).getTime()
+      : formatDate(date!).getTime() === formatDate(tag.date).getTime() &&
+        tag.type === selectedTagType
   );
 };
 

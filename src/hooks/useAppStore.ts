@@ -6,6 +6,8 @@ interface Store {
   selectedTagId: number | null;
   updateTagType: (text: string) => void;
   updateTagId: (id: number | null) => void;
+  tradeHistoryUrl: string;
+  updateTradeHistoryUrl: (url: string) => void;
 }
 
 export const useAppStore = create<Store>()(
@@ -14,7 +16,9 @@ export const useAppStore = create<Store>()(
       selectedTagType: "setup",
       selectedTagId: null,
       updateTagType: (selectedTagType) => set({ selectedTagType }),
-      updateTagId: (id: number | null) => set({ selectedTagId: id }),
+      updateTagId: (selectedTagId: number | null) => set({ selectedTagId }),
+      tradeHistoryUrl: "",
+      updateTradeHistoryUrl: (tradeHistoryUrl) => set({ tradeHistoryUrl }),
     }),
     {
       name: "selectedTagType-storage",

@@ -6,12 +6,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgres"
+  provider  = "postgres"
   // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
   // Further reading:
   // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
 }
 
 // Necessary for Next auth
@@ -90,23 +91,26 @@ model Tag {
 }
 
 model TradeTagRelation {
-  id     Int    @id @default(autoincrement())
-  tagId  Int
-  symbol String
-  date   String
-  userId String
+  id      Int    @id @default(autoincrement())
+  tagId   Int
+  symbol  String
+  date    String
+  userId  String
+  tradeId Int
 
-  tag  Tag  @relation(fields: [tagId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  tag          Tag          @relation(fields: [tagId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  tradeDetails TradeDetails @relation(fields: [tradeId], references: [id])
 
   @@unique([tagId, symbol, date, userId])
 }
 
 model TradeDetails {
-  id           Int            @id @default(autoincrement())
+  id           Int                @id @default(autoincrement())
   symbol       String
   date         String
   tradeHistory TradeHistory[]
   rating       Int?
-  notes        String?        @db.Text
+  notes        String?            @db.Text
+  tradeTags    TradeTagRelation[]
 }

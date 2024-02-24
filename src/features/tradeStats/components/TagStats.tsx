@@ -6,18 +6,20 @@ import { api } from "~/utils/api";
 import { getTagClassName } from "../utils/helper";
 
 export const TagStats = () => {
+  const selectedTagType = useAppStore((state) => state.selectedTagType);
+  const updateTagType = useAppStore((state) => state.updateTagType);
+  const updateTagId = useAppStore((state) => state.updateTagId);
+
   const router = useRouter();
   const startDate = router.query.from as string;
   const endDate = router.query.to as string;
+
   const { data, isSuccess } = api.tags.getStats.useQuery(
     { startDate, endDate },
     {
       refetchOnWindowFocus: false,
     }
   );
-  const selectedTagType = useAppStore((state) => state.selectedTagType);
-  const updateTagType = useAppStore((state) => state.updateTagType);
-  const updateTagId = useAppStore((state) => state.updateTagId);
 
   const tags = data?.tags;
 
@@ -35,6 +37,21 @@ export const TagStats = () => {
         })
     : [];
 
+  const handleTagFilterNavigation = async (id: number) => {
+    const currentQuery = router.query;
+
+    const isQueryEmpty = Object.keys(currentQuery).length === 0;
+
+    const newQuery = isQueryEmpty
+      ? `filter=${id}`
+      : `${router.asPath.slice(2)}&filter=${id}`;
+
+    await router.push({
+      pathname: "/trades",
+      query: newQuery,
+    });
+  };
+
   const tagColors: Record<string, string> = {
     setup: "step-primary",
     mistake: "step-error",
@@ -42,10 +59,10 @@ export const TagStats = () => {
   };
 
   return (
-    <div className="mb-4 hidden text-center lg:mb-0 lg:ml-14 lg:mr-4 lg:block lg:self-start">
+    <div className="mb-4  text-center lg:mb-0 lg:ml-14 lg:mr-4 lg:block lg:self-start">
       <div className="px-5 text-center 2xl:w-full">
         <div className="flex justify-center">
-          <div className="tabs-boxed tabs w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
+          <div className="tabs tabs-boxed w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
             {["setup", "mistake", "custom", "all"].map((tab) => (
               <p
                 key={tab}
@@ -78,6 +95,7 @@ export const TagStats = () => {
                   )}`}
                   onMouseEnter={() => updateTagId(tag.tagId)}
                   onMouseLeave={() => updateTagId(null)}
+                  onClick={() => void handleTagFilterNavigation(tag.tagId)}
                 >
                   {tag.name} x {tag.count}
                 </div>
@@ -86,7 +104,7 @@ export const TagStats = () => {
           </ul>
         ) : (
           <div className="flex h-96  w-[24rem] items-center  justify-center rounded-b-3xl bg-base-200 pl-5 pt-1 min-[1920px]:w-[36rem]">
-            <span className="loading loading-dots loading-md text-primary"></span>
+            <span className="loading loading-infinity loading-lg text-primary"></span>
           </div>
         )}
       </div>
