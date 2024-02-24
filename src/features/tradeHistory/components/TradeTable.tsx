@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 
 import Link from "next/link";
 
+import { useAppStore } from "~/hooks/useAppStore";
+
 import moment from "moment";
 
 import type { TradeDetailsData } from "../types";
@@ -12,6 +14,8 @@ interface Props {
 }
 
 export const TradeTable = ({ trades, handleNextTrades }: Props) => {
+  const updateTagType = useAppStore((state) => state.updateTagType);
+
   const tableRef = useRef<HTMLTableElement | null>(null);
   useEffect(() => {
     if (tableRef.current) {
@@ -73,12 +77,13 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
                       Profit > 0 ? "badge-success" : "badge-error"
                     }`}
                   >
-                    ${Math.abs(Profit)}
+                    ${Math.abs(Profit).toFixed(2)}
                   </span>
                 </td>
                 <td>
                   <button className="btn btn-ghost btn-xs">
                     <Link
+                      onClick={() => updateTagType("details")}
                       href={{
                         pathname: `/trades/${Symbol}`,
                         query: {
