@@ -113,4 +113,17 @@ model TradeDetails {
   rating       Int?
   notes        String?            @db.Text
   tradeTags    TradeTagRelation[]
+  priceLines   PriceLine[]
+}
+
+model PriceLine {
+id       Int     @id @default(autoincrement())
+title    String
+price    Float
+color    String
+style Int
+size Int
+
+tradeDetailsId Int
+tradeDetails   TradeDetails @relation(fields: [tradeDetailsId], references: [id])
 }
