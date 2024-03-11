@@ -1,5 +1,6 @@
 import React from "react";
 
+import { PriceLineModal } from "~/components/modals";
 import { api } from "~/utils/api";
 
 import type { DailyTrades, DetailsCardTag } from "../type";
@@ -12,6 +13,15 @@ interface Props {
   symbol: string;
   date: string;
 }
+
+const openPriceLineModal = () => {
+  const modal = document.getElementById(
+    "price_line_modal"
+  ) as HTMLDialogElement | null;
+  if (modal) {
+    modal.showModal();
+  }
+};
 
 export const TradeDetails = ({ trades, symbol, date }: Props) => {
   const { data } = api.tags.getTags.useQuery(
@@ -86,9 +96,19 @@ export const TradeDetails = ({ trades, symbol, date }: Props) => {
           <TagSelect value={value} options={options} tagType={type} />
         </div>
       ))}
-      <div className="mt-5 space-y-3">
-        <div className="card-title">Rating:</div>
-        <TradeRating symbol={symbol} date={date} tradePnL={tradePnL} />
+      <div className="mt-3 flex  items-baseline justify-between">
+        <div>
+          <div className="card-title">Rating:</div>
+          <TradeRating symbol={symbol} date={date} tradePnL={tradePnL} />
+        </div>
+
+        <button
+          className="card-title underline hover:opacity-80"
+          onClick={() => openPriceLineModal()}
+        >
+          Add/Modify Price Lines
+        </button>
+        <PriceLineModal />
       </div>
     </>
   );

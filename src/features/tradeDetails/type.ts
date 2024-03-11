@@ -57,6 +57,15 @@ export interface TradeTags {
 export type DetailsCardTag = {
   type: "Setup" | "Mistake" | "Custom";
   className: string;
-  value: TagDetail[] | undefined; // Replace with the actual type you expect for value
-  options: TagDetail[] | undefined; // Replace with the actual type you expect for options
+  value: TagDetail[] | undefined;
+  options: TagDetail[] | undefined;
 };
+
+export const priceLineSchema = z.object({
+  id: z.number().optional(),
+  title: z.string(),
+  price: z.string(),
+  color: z.string(),
+  style: z.string(),
+  size: z.string(),
+});

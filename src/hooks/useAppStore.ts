@@ -3,11 +3,13 @@ import { persist } from "zustand/middleware";
 
 interface Store {
   selectedTagType: string;
-  selectedTagId: number | null;
   updateTagType: (text: string) => void;
+  selectedTagId: number | null;
   updateTagId: (id: number | null) => void;
   tradeHistoryUrl: string;
   updateTradeHistoryUrl: (url: string) => void;
+  hiddenPriceLineIds: number[];
+  updateHiddenPriceLine: (number: number) => void;
 }
 
 export const useAppStore = create<Store>()(
@@ -19,9 +21,18 @@ export const useAppStore = create<Store>()(
       updateTagId: (selectedTagId: number | null) => set({ selectedTagId }),
       tradeHistoryUrl: "",
       updateTradeHistoryUrl: (tradeHistoryUrl) => set({ tradeHistoryUrl }),
+      hiddenPriceLineIds: [],
+      updateHiddenPriceLine: (number) =>
+        set((state) => {
+          const updatedData = state.hiddenPriceLineIds.includes(number)
+            ? state.hiddenPriceLineIds.filter((n) => n !== number)
+            : [...state.hiddenPriceLineIds, number];
+
+          return { hiddenPriceLineIds: updatedData };
+        }),
     }),
     {
-      name: "selectedTagType-storage",
+      name: "tradeCopilot-storage",
     }
   )
 );
