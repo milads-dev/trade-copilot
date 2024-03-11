@@ -3,14 +3,16 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 
 import { type CandlestickData, generateMarkers } from "~/features/tradeDetails";
+import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
 
-import { createChart } from "lightweight-charts";
+import { type LineWidth, createChart } from "lightweight-charts";
 
 export const CandleStickChart = () => {
   const router = useRouter();
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
+  const hiddenPriceLineIds = useAppStore((state) => state.hiddenPriceLineIds);
 
   const { data: details, isLoading } = api.trades.getTradeDetails.useQuery(
     { symbol, date },
@@ -26,6 +28,14 @@ export const CandleStickChart = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  const { data: priceLineData } = api.tradeDetails.getPriceLines.useQuery(
+    { symbol, date },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const { priceLines = [] } = priceLineData ?? {};
 
   const { data: candleData = [] } = details ?? {};
   const { dailyTrades } = data ?? {};
@@ -69,7 +79,18 @@ export const CandleStickChart = () => {
       const candleSeriesData: CandlestickData[] = candleData;
       candleSeries.setData(candleSeriesData);
     }
-
+    if (priceLines.length > 0)
+      priceLines
+        .filter((line) => !hiddenPriceLineIds.includes(line.id))
+        .map((line) =>
+          candleSeries.createPriceLine({
+            title: line.title,
+            price: parseFloat(line.price),
+            color: line.color,
+            lineStyle: parseInt(line.style),
+            lineWidth: parseInt(line.size) as LineWidth,
+          })
+        );
     if (dailyTrades) candleSeries.setMarkers(generateMarkers(dailyTrades));
 
     chart.timeScale().fitContent();
@@ -77,7 +98,7 @@ export const CandleStickChart = () => {
     return () => {
       chart.remove();
     };
-  }, [candleData, dailyTrades]);
+  }, [candleData, dailyTrades, priceLines, hiddenPriceLineIds]);
 
   return (
     <section className="relative">
