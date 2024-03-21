@@ -207,17 +207,18 @@ export const tradesRouter = createTRPCRouter({
       z.object({
         symbol: z.string(),
         date: z.string(),
+        timeFrame: z.number(),
       })
     )
     .query(async ({ input }) => {
-      const { symbol, date } = input;
+      const { symbol, date, timeFrame } = input;
 
       const { validSymbol } = getSymbol(symbol);
 
       try {
         const data: unknown = await (
           await fetch(
-            `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=1min&symbol=${validSymbol}&dp=2&start_date=${date} 9:30:00&end_date=${date} 16:00:00`
+            `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=${timeFrame}min&symbol=${validSymbol}&dp=2&start_date=${date} 9:30:00&end_date=${date} 16:00:00`
           )
         ).json();
 

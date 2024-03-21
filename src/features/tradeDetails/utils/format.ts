@@ -44,16 +44,33 @@ export const formatDateForDetails = (date: string): string => {
   return moment(date).format("dddd MMMM Do YYYY");
 };
 
-export const generateMarkers = (dailyTrades: DailyTrades) => {
+export const generateMarkers = (
+  dailyTrades: DailyTrades,
+  timeFrame: number
+) => {
   return (
     dailyTrades.map((trade) => ({
-      time: trade.Marker as UTCTimestamp,
+      time: subtractMinutesFromUnixTime(
+        trade.Marker,
+        timeFrame
+      ) as UTCTimestamp,
       position: "aboveBar" as SeriesMarkerPosition,
       color: trade.Volume > 0 ? GREEN_MARKER : RED_MARKER,
       shape: "arrowDown" as SeriesMarkerShape,
       text: `${trade.Volume} x ${trade.Price}`,
     })) ?? []
   );
+};
+
+const subtractMinutesFromUnixTime = (
+  unixTime: number,
+  minutes: number
+): number => {
+  if (minutes == 1) return unixTime;
+
+  const milliseconds = unixTime * 1000;
+  const newMilliseconds = milliseconds - minutes * 60 * 1000;
+  return Math.floor(newMilliseconds / 1000);
 };
 
 export const formatTradeTags = (data: Tag[]): TradeTags => {

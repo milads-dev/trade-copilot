@@ -13,3 +13,12 @@ export const generateTradeDetailsUrl = (
     return null;
   }
 };
+
+export const openPriceLineModal = () => {
+  const modal = document.getElementById(
+    "timeframe_modal"
+  ) as HTMLDialogElement | null;
+  if (modal) {
+    modal.showModal();
+  }
+};
