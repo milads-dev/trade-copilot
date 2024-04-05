@@ -62,7 +62,7 @@ export const TagStats = () => {
     <div className="mb-4  text-center lg:mb-0 lg:ml-14 lg:mr-4 lg:block lg:self-start">
       <div className="px-5 text-center 2xl:w-full">
         <div className="flex justify-center">
-          <div className="tabs tabs-boxed w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
+          <div className="tabs-boxed tabs w-[24rem] justify-around rounded-b-none min-[1920px]:w-[36rem]">
             {["setup", "mistake", "custom", "all"].map((tab) => (
               <p
                 key={tab}

@@ -5,7 +5,7 @@ export const getSymbol = (symbol: string) => {
     US100: "QQQ",
     US500: "SPY",
     US30: "DIA",
-    NAS100: "QQQ",
+    NAS100: "NDX",
   };
 
   let filteredSymbol = symbol.split(".")[0]?.toUpperCase();
