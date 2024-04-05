@@ -202,7 +202,7 @@ export const tradesRouter = createTRPCRouter({
         return { dailyTrades: [], lastTrade: null, nextTrade: null };
       }
     }),
-  getTradeDetails: protectedProcedure
+  getChartData: protectedProcedure
     .input(
       z.object({
         symbol: z.string(),
