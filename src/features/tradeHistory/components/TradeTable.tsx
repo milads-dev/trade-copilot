@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { useAppStore } from "~/hooks/useAppStore";
 
@@ -15,6 +16,8 @@ interface Props {
 
 export const TradeTable = ({ trades, handleNextTrades }: Props) => {
   const updateTagType = useAppStore((state) => state.updateTagType);
+  const updateTradeUrl = useAppStore((state) => state.updateTradeHistoryUrl);
+  const router = useRouter();
 
   const tableRef = useRef<HTMLTableElement | null>(null);
   useEffect(() => {
@@ -38,6 +41,11 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const updateState = () => {
+    updateTagType("details");
+    updateTradeUrl(router.asPath);
+  };
 
   return (
     <div
@@ -83,7 +91,7 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
                 <td>
                   <button className="btn btn-ghost btn-xs">
                     <Link
-                      onClick={() => updateTagType("details")}
+                      onClick={() => updateState()}
                       href={{
                         pathname: `/trades/${Symbol}`,
                         query: {

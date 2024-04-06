@@ -91,12 +91,12 @@ export const TradeDetails = ({ trades, symbol, date }: Props) => {
         <span className="card-title ml-2">{formatDateForDetails(date)}</span>
       </div>
       {TAGS.map(({ value, options, type, className }) => (
-        <div key={type}>
+        <div className="-mt-3 space-y-3" key={type}>
           <div className={className}> {type}</div>
           <TagSelect value={value} options={options} tagType={type} />
         </div>
       ))}
-      <div className="mt-3 flex  items-baseline justify-between">
+      <div className="mt-8 flex items-baseline justify-between">
         <div>
           <div className="card-title">Rating:</div>
           <TradeRating symbol={symbol} date={date} tradePnL={tradePnL} />

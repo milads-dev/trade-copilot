@@ -99,8 +99,8 @@ export const PriceLineTable = ({
                     checked={hiddenPriceLineIds.includes(row.id)}
                     onChange={() => updateHiddenPriceLine(row.id)}
                   />
-                  <EyeOpenIcon />
-                  <EyeClosedIcon />
+                  <EyeOpenIcon className="swap-off" />
+                  <EyeClosedIcon className="swap-on" />
                 </label>
               </th>
 

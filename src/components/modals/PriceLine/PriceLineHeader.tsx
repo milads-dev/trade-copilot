@@ -45,7 +45,7 @@ export const PriceLineHeader = ({
         <div className="divider divider-horizontal"></div>
         <div className="flex flex-col items-center">
           <details
-            className="dropdown-right dropdown-hover dropdown absolute top-[5.5rem]"
+            className="dropdown dropdown-right dropdown-hover absolute top-[5.5rem]"
             ref={dropdownRef}
           >
             <summary

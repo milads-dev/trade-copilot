@@ -1,21 +1,38 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { type CandlestickData, generateMarkers } from "~/features/tradeDetails";
+import {
+  type CandlestickData,
+  type DailyTrades,
+  generateMarkers,
+  openPriceLineModal,
+} from "~/features/tradeDetails";
 import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
 
-import { type LineWidth, createChart } from "lightweight-charts";
+import {
+  type BarData,
+  type LineWidth,
+  type Time,
+  createChart,
+} from "lightweight-charts";
 
-export const CandleStickChart = () => {
+import { TimeFrameModal } from "../modals";
+import { createChartToolTip, renderChartToolTip } from "./helper";
+
+interface Props {
+  chartMarkers: DailyTrades | null | undefined | "hidden";
+}
+export const CandleStickChart = ({ chartMarkers }: Props) => {
   const router = useRouter();
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
   const hiddenPriceLineIds = useAppStore((state) => state.hiddenPriceLineIds);
+  const [timeFrame, setTimeFrame] = useState(1);
 
-  const { data: details, isLoading } = api.trades.getTradeDetails.useQuery(
-    { symbol, date },
+  const { data: details, isLoading } = api.trades.getChartData.useQuery(
+    { symbol, date, timeFrame },
     {
       refetchOnWindowFocus: false,
       staleTime: 20 * (60 * 1000),
@@ -91,21 +108,78 @@ export const CandleStickChart = () => {
             lineWidth: parseInt(line.size) as LineWidth,
           })
         );
-    if (dailyTrades) candleSeries.setMarkers(generateMarkers(dailyTrades));
+    if (dailyTrades) {
+      if (chartMarkers && chartMarkers.length > 0) {
+        if (typeof chartMarkers !== "string") {
+          candleSeries.setMarkers(
+            generateMarkers(
+              chartMarkers.sort((a, b) => a.Marker - b.Marker),
+              timeFrame
+            )
+          );
+        }
+      } else {
+        candleSeries.setMarkers(generateMarkers(dailyTrades, timeFrame));
+      }
+    }
+    const container = document.getElementById("candleChart");
+
+    const toolTip = createChartToolTip(container);
+
+    chart.subscribeCrosshairMove((param) => {
+      const data = param.seriesData.get(candleSeries) as BarData<Time>;
+
+      if (
+        param.point === undefined ||
+        !param.time ||
+        !dailyTrades?.some((trade) => trade.Marker === data?.time) ||
+        timeFrame !== 1
+      ) {
+        toolTip.style.display = "none";
+      } else {
+        const tradeWithMarker = dailyTrades?.find(
+          (trade) => trade.Marker === data?.time
+        );
+
+        const candlePrice = param.seriesData.get(candleSeries) as BarData<Time>;
+        if (candlePrice === undefined || tradeWithMarker?.Profit === 0) {
+          toolTip.style.display = "none";
+        } else {
+          toolTip.style.display = "block";
+          renderChartToolTip(
+            toolTip,
+            tradeWithMarker!.Profit,
+            candleSeries,
+            candlePrice,
+            param.point.x
+          );
+        }
+      }
+    });
 
     chart.timeScale().fitContent();
 
     return () => {
       chart.remove();
     };
-  }, [candleData, dailyTrades, priceLines, hiddenPriceLineIds]);
+  }, [
+    candleData,
+    dailyTrades,
+    priceLines,
+    hiddenPriceLineIds,
+    chartMarkers,
+    timeFrame,
+  ]);
 
   return (
     <section className="relative">
       <div
+        id="candleChart"
         className={`cursor relative  ${isLoading && "opacity-20"}`}
         ref={chartRef}
         style={{ backgroundColor: "#624b4b" }}
+        onKeyDown={() => openPriceLineModal()}
+        tabIndex={1}
       ></div>
       {isLoading ? (
         <span className="loading loading-infinity loading-lg absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform text-success"></span>
@@ -119,6 +193,7 @@ export const CandleStickChart = () => {
             </span>
           </div>
         ))}
+      <TimeFrameModal timeFrame={timeFrame} setTimeFrame={setTimeFrame} />
     </section>
   );
 };

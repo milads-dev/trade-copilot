@@ -40,7 +40,9 @@ export const DetailsCard = ({ trades, isSuccess }: Props) => {
           </div>
         </div>
         {selectedTagType === "details" && (
-          <TradeDetails trades={trades} symbol={symbol} date={date} />
+          <div className="min-h-[37rem]">
+            <TradeDetails trades={trades} symbol={symbol} date={date} />
+          </div>
         )}
         {selectedTagType === "notes" && (
           <div className="mt-5 w-full self-center">
