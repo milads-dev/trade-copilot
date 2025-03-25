@@ -31,7 +31,7 @@ export const PriceLineHeader = ({
           value={priceLine.title}
           onChange={(e) => handleInputChange("title", e.target.value)}
           placeholder="Title (optional)"
-          maxLength={8}
+          maxLength={15}
           className="input input-bordered w-full max-w-[15rem] rounded-2xl"
         />
 

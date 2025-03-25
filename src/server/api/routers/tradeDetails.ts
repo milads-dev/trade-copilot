@@ -53,7 +53,15 @@ export const tradeDetails = createTRPCRouter({
 
       try {
         const tradeDetails = await ctx.prisma.tradeDetails.findFirst({
-          where: { symbol, date },
+          where: {
+            symbol,
+            date,
+            tradeHistory: {
+              some: {
+                userId: ctx.session.user.id,
+              },
+            },
+          },
         });
 
         if (!tradeDetails)

@@ -89,7 +89,12 @@ export const tradesRouter = createTRPCRouter({
           };
         });
 
-        return { trades: processDailyTrades(formattedTrades), nextCursor };
+        const sortedTrades = processDailyTrades(formattedTrades).sort(
+          (a, b) =>
+            new Date(a.openTimeStamp).getTime() -
+            new Date(b.openTimeStamp).getTime()
+        );
+        return { trades: sortedTrades, nextCursor };
       } catch (error) {
         console.error("Error retrieving trades:", error);
         throw new Error("Failed to retrieve trades.");
@@ -114,6 +119,11 @@ export const tradesRouter = createTRPCRouter({
           where: {
             symbol,
             date,
+            tradeHistory: {
+              some: {
+                userId: ctx.session.user.id,
+              },
+            },
           },
         });
         if (!tradeDetails) {
@@ -145,6 +155,7 @@ export const tradesRouter = createTRPCRouter({
           FROM "TradeHistory"
           WHERE DATE_TRUNC('day', "TimeStamp") = DATE_TRUNC('day', ${date}::date)
           AND "Symbol" = ${symbol}
+          AND "userId" = ${ctx.session.user.id}
           ORDER BY "TimeStamp" ASC;
         `;
         const formatedTrades = result.map((trades) => ({
