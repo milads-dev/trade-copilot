@@ -69,7 +69,7 @@ const transformTopStepData = (tradeData: topStepTradeType) => {
     } else {
       combinedExitTrades[exitKey]!.Size +=
         trade.Type === "Long" ? -trade.Size : trade.Size;
-      combinedExitTrades[exitKey].PnL += trade.PnL;
+      combinedExitTrades[exitKey]!.PnL += trade.PnL;
     }
   });
 
