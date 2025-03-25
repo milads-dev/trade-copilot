@@ -1,25 +1,105 @@
 import moment from "moment";
+import { type z } from "zod";
 
 import {
   type TradeDetailsData,
   type dataBaseTradeArrayType,
+  type ibkrArrayCsvSchema,
   ibkrCsvSchema,
+  type metaTraderArrayCsvSchema,
   metaTraderCsvSchema,
+  type topStepArrayCsvSchema,
 } from "../types";
-import { isIbkrCsv, isMetaTraderCsv } from "./validation";
+
+type topStepTradeType = z.infer<typeof topStepArrayCsvSchema>;
+type metaTraderTradeType = z.infer<typeof metaTraderArrayCsvSchema>;
+type ibkrTradeType = z.infer<typeof ibkrArrayCsvSchema>;
+interface Trade {
+  Name: string;
+  Time: string;
+  Price: number;
+  PnL: number;
+  Size: number;
+}
 
 const ORDER_TYPE = "sell";
 const DIFFERNCE_IN_TIMEZONE = 7;
 
-export const formatTradeCsvData = (data: unknown[]) => {
-  if (isMetaTraderCsv(data)) {
-    return data.map((tradeRow) => formatMetaTraderData(tradeRow));
-  } else if (isIbkrCsv(data)) {
-    return data.map((tradeRow) => formatIbkrData(tradeRow));
-  } else return data;
+export const transformCsvData = (data: unknown[], tradeSchema: string) => {
+  if (tradeSchema === "topStep") {
+    const tradeData = data as topStepTradeType;
+    return transformTopStepData(tradeData);
+  } else if (tradeSchema === "metaTrader") {
+    const tradeData = data as metaTraderTradeType;
+    return tradeData.map((tradeRow) => transformMetaTraderData(tradeRow));
+  } else if (tradeSchema === "ibkr") {
+    const tradeData = data as ibkrTradeType;
+    return tradeData.map((tradeRow) => transformIbkrData(tradeRow));
+  } else return null;
 };
 
-const formatMetaTraderData = (tradeRow: typeof metaTraderCsvSchema) => {
+const transformTopStepData = (tradeData: topStepTradeType) => {
+  const combinedEntryTrades: Record<string, Trade> = {};
+  const combinedExitTrades: Record<string, Trade> = {};
+  tradeData.forEach((trade) => {
+    const key = `${trade.EnteredAt}-${trade.EntryPrice}`;
+    const exitKey = `${trade.ExitedAt}-${trade.ExitPrice}`;
+
+    if (!combinedEntryTrades[key]) {
+      combinedEntryTrades[key] = {
+        Time: trade.EnteredAt,
+        Price: trade.EntryPrice,
+        PnL: 0,
+        Size: trade.Type === "Long" ? trade.Size : -trade.Size,
+        Name: trade.ContractName,
+      };
+    } else {
+      combinedEntryTrades[key].Size +=
+        trade.Type === "Long" ? trade.Size : -trade.Size;
+    }
+
+    if (!combinedExitTrades[exitKey]) {
+      combinedExitTrades[exitKey] = {
+        Time: trade.ExitedAt,
+        Price: trade.ExitPrice,
+        PnL: trade.PnL,
+        Size: trade.Type === "Long" ? -trade.Size : trade.Size,
+        Name: trade.ContractName,
+      };
+    } else {
+      combinedExitTrades[exitKey].Size +=
+        trade.Type === "Long" ? -trade.Size : trade.Size;
+      combinedExitTrades[exitKey].PnL += trade.PnL;
+    }
+  });
+
+  const combinedArray = [
+    ...Object.values(combinedEntryTrades),
+    ...Object.values(combinedExitTrades),
+  ];
+
+  combinedArray.sort(
+    (a, b) => new Date(a.Time).getTime() - new Date(b.Time).getTime()
+  );
+  const formattedTrades = combinedArray.map((trade) => {
+    const { Name, Time, PnL, Price, Size } = trade;
+
+    const date = moment(Time, "MM/DD/YYYY HH:mm:ss").subtract(0, "hours");
+    const formattedDate = date.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+
+    return {
+      Symbol: Name,
+      TimeStamp: formattedDate,
+      Price: Price,
+      Profit: PnL,
+      Volume: Size,
+    };
+  });
+
+  return formattedTrades;
+};
+
+const transformMetaTraderData = (tradeRow: metaTraderTradeType[0]) => {
   const validRow = metaTraderCsvSchema.parse(tradeRow);
 
   const date = moment(validRow.Time, "YYYY.MM.DD HH:mm:ss").subtract(
@@ -36,7 +116,7 @@ const formatMetaTraderData = (tradeRow: typeof metaTraderCsvSchema) => {
   };
 };
 
-const formatIbkrData = (tradeRow: typeof ibkrCsvSchema) => {
+const transformIbkrData = (tradeRow: ibkrTradeType[0]) => {
   const validRow = ibkrCsvSchema.parse(tradeRow);
   const date = moment(validRow.DateTime, "MM/DD/YYYY,HH:mm:ss");
   const formattedDate = date.format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
@@ -98,15 +178,15 @@ const sortTradesByDayAndSymbol = (trades: dataBaseTradeArrayType) => {
     const aDate = moment(a.TimeStamp);
     const bDate = moment(b.TimeStamp);
 
-    // This might still be needed TBD
-    // if (aDate.isSame(bDate, "month")) {
-    //   if (aDate.isSame(bDate, "day")) {
-    //     return a.Symbol.localeCompare(b.Symbol);
-    //   } else {
-    //     return aDate.date() - bDate.date();
-    //   }
-    // }
-    return aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+    if (aDate.month() !== bDate.month()) {
+      return aDate.month() - bDate.month();
+    }
+
+    if (aDate.date() !== bDate.date()) {
+      return aDate.date() - bDate.date();
+    }
+
+    return a.Symbol.localeCompare(b.Symbol);
   });
 };
 

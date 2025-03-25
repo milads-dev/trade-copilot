@@ -13,6 +13,29 @@ const baseTradeSchema = z.object({
   Volume: z.number(),
 });
 
+export const topStepXTradeSchema = z.object({
+  ContractName: z.string(),
+  EnteredAt: z.string(),
+  ExitedAt: z.string(),
+  TradeDay: z.string(),
+  Type: z.enum(["Long", "Short"]),
+  Id: z.number(),
+  EntryPrice: z.number(),
+  ExitPrice: z.number(),
+  Fees: z.number(),
+  PnL: z.number(),
+  Size: z.number(),
+});
+
+export const metaTraderCsvSchemaDemo = z.object({
+  Symbol: z.string(),
+  Price: z.number(),
+  Profit: z.number(),
+  Volume: z.number(),
+  Time: z.string(),
+  Type: z.string(),
+});
+
 export const metaTraderCsvSchema = baseTradeSchema.extend({
   Time: z.string(),
   Type: z.string(),
@@ -30,9 +53,15 @@ export const ibkrCsvSchema = z.object({
   Quantity: z.number(),
 });
 
-export const generalCsvSchema = z.union([metaTraderCsvSchema, ibkrCsvSchema]);
+export const unionCsvSchema = z.union([metaTraderCsvSchema, ibkrCsvSchema]);
 
-export const arrayCsvSchema = z.array(generalCsvSchema);
+export const unionArrayCsvSchema = z.array(unionCsvSchema);
+
+export const topStepArrayCsvSchema = z.array(topStepXTradeSchema);
+
+export const metaTraderArrayCsvSchema = z.array(metaTraderCsvSchema);
+
+export const ibkrArrayCsvSchema = z.array(ibkrCsvSchema);
 
 export const dataBaseTradeArraySchema = z.array(dataBaseTradeSchema);
 

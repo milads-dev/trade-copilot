@@ -3,15 +3,38 @@ import { useCSVReader } from "react-papaparse";
 
 import { api } from "~/utils/api";
 
-import { arrayCsvSchema, dataBaseTradeArraySchema } from "../types";
-import { formatTradeCsvData, getValidCsvData } from "../utils";
+import { type z } from "zod";
+
+import {
+  topStepArrayCsvSchema,
+  unionArrayCsvSchema,
+} from "../../../features/tradeHistory/types";
+import {
+  getValidCsvData,
+  transformCsvData,
+} from "../../../features/tradeHistory/utils";
+import { type TradeDetails } from "../types";
 
 interface CsvObject {
   data: unknown[];
   error: unknown;
   meta: unknown;
 }
-export const CsvFileUpload = () => {
+
+type ParentProps = {
+  setTradeData: React.Dispatch<React.SetStateAction<TradeDetails[]>>;
+  tradeSchema: string;
+};
+
+const schemaMap: Record<string, z.Schema> = {
+  topStep: topStepArrayCsvSchema,
+  metaTrader: unionArrayCsvSchema,
+  ibkr: unionArrayCsvSchema,
+};
+export const CsvFileUpload: React.FC<ParentProps> = ({
+  tradeSchema,
+  setTradeData,
+}) => {
   /* eslint-disable @typescript-eslint/no-unsafe-assignment */
   const { CSVReader } = useCSVReader();
   const ctx = api.useContext();
@@ -20,28 +43,39 @@ export const CsvFileUpload = () => {
     onSuccess: () => ctx.trades.invalidate(),
   });
 
-  const handleOnDrop = (input: CsvObject) => {
+  const handleOnDrop = (input: CsvObject, tradeSchema: string) => {
     const { data } = input;
+    const selectedSchema = schemaMap[tradeSchema];
 
-    const result = arrayCsvSchema.safeParse(getValidCsvData(data));
+    if (selectedSchema) {
+      const result = selectedSchema.safeParse(
+        getValidCsvData(data, tradeSchema)
+      );
 
-    if (result.success) {
-      const { data } = result;
-      const dbTrades = dataBaseTradeArraySchema.parse(formatTradeCsvData(data));
+      if (result.success) {
+        const transformTradeData = transformCsvData(
+          result.data as unknown[],
+          tradeSchema
+        );
 
-      mutation.mutate(dbTrades);
-    } else {
-      //TODO: Refactor Error Handling for UI
-      console.error("Validation Error:", result.error);
+        if (transformTradeData !== null && transformTradeData.length > 0)
+          setTradeData(transformTradeData);
+        else {
+          alert("Wrong Trade Format");
+        }
+      }
     }
   };
+
   return (
     <CSVReader
       config={{
         header: true,
         dynamicTyping: true,
       }}
-      onUploadAccepted={(result: CsvObject) => handleOnDrop(result)}
+      onUploadAccepted={(result: CsvObject) =>
+        handleOnDrop(result, tradeSchema)
+      }
     >
       {({
         getRootProps,
@@ -52,7 +86,7 @@ export const CsvFileUpload = () => {
       any) => (
         <div>
           {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
-          <button className="btn btn-primary" {...getRootProps()}>
+          <button className="btn btn-primary w-full" {...getRootProps()}>
             <span>Import CSV</span>
             {mutation.isLoading ? (
               <span className="loading loading-dots loading-md"></span>

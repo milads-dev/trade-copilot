@@ -1,23 +1,40 @@
 import {
-  generalCsvSchema,
   type ibkrCsvSchema,
   type metaTraderCsvSchema,
+  topStepXTradeSchema,
+  unionCsvSchema,
 } from "../types";
 
-const validateCsvData = (data: unknown[]) =>
-  data
+type ValidSchema = typeof topStepXTradeSchema | typeof unionCsvSchema;
+
+const schemaMap: Record<string, ValidSchema> = {
+  topStep: topStepXTradeSchema,
+  metaTrader: unionCsvSchema,
+  ibkr: unionCsvSchema,
+};
+
+const validateCsvData = (data: unknown[], schemaKey: string) => {
+  const selectedSchema = schemaMap[schemaKey];
+
+  if (!selectedSchema) {
+    console.error(`Schema not found for key: ${schemaKey}`);
+    return null;
+  }
+
+  return data
     .map((tradeRow) => {
-      const validatedTradeRow = generalCsvSchema.safeParse(tradeRow);
+      const validatedTradeRow = selectedSchema.safeParse(tradeRow);
       if (validatedTradeRow.success) {
         return validatedTradeRow.data;
       } else {
-        console.error("Validation Error for item:", validatedTradeRow.error);
         return null;
       }
     })
     .filter((item) => item !== null);
+};
 
-export const getValidCsvData = (data: unknown[]) => validateCsvData(data);
+export const getValidCsvData = (data: unknown[], schemaKey: string) =>
+  validateCsvData(data, schemaKey);
 
 export const isMetaTraderCsv = (
   inputArray: unknown[]
