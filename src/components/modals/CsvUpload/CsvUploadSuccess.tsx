@@ -51,7 +51,7 @@ const CsvUploadSuccess = ({
       <div className="mt-5 flex h-full w-full flex-col space-y-8">
         <div className="flex flex-col items-center">
           <Image
-            src="/assets/trade-import-success.jpeg"
+            src="/assets/Trade-Import-Success.jpeg"
             alt="Trade Import Success"
             width={550}
             height={550}
