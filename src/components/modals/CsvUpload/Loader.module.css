@@ -1,0 +1,101 @@
+/* From Uiverse.io by Juanes200122 */ 
+.container {
+    background-color: #414141;
+  }
+  @keyframes bounce {
+    0%,
+    100% {
+      translate: 0px 36px;
+    }
+    50% {
+      translate: 0px 46px;
+    }
+  }
+  @keyframes bounce2 {
+    0%,
+    100% {
+      translate: 0px 46px;
+    }
+    50% {
+      translate: 0px 56px;
+    }
+  }
+  
+  @keyframes umbral {
+    0% {
+      stop-color: #d3a5102e;
+    }
+    50% {
+      stop-color: rgba(211, 165, 16, 0.519);
+    }
+    100% {
+      stop-color: #d3a5102e;
+    }
+  }
+  @keyframes partciles {
+    0%,
+    100% {
+      translate: 0px 16px;
+    }
+    50% {
+      translate: 0px 6px;
+    }
+  }
+  #particles {
+    animation: partciles 4s ease-in-out infinite;
+  }
+  #animatedStop {
+    animation: umbral 4s infinite;
+  }
+  #bounce {
+    animation: bounce 4s ease-in-out infinite;
+    translate: 0px 36px;
+  }
+  #bounce2 {
+    animation: bounce2 4s ease-in-out infinite;
+    translate: 0px 46px;
+    animation-delay: 0.5s;
+  }
+  
+  .animatedPolygon {
+    stroke: gold; /* Gold stroke */
+    stroke-width: 1;
+    animation: bounce4 2s ease-in-out infinite alternate;
+    transform-origin: 100px 100px;
+
+  }
+  
+  .animatedPolygon2 {
+    stroke: gold; /* Gold stroke */
+    stroke-width: 1;
+    animation: bounce2 2s ease-in-out infinite alternate;
+    transform-origin: 100px 100px; 
+
+  }
+  
+  /* Bouncing animation */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0px);
+      
+    }
+    50% {
+      transform: translateY(36px);
+    }
+  }
+  @keyframes bounce4 {
+    0%, 100% {
+      transform: translateY(36px) rotate(45deg); 
+    }
+    50% {
+      transform: translateY(46px) rotate(45deg); 
+    }
+  }
+  @keyframes bounce2 {
+    0%, 100% {
+      transform: translateY(45px) rotate(45deg); 
+    }
+    50% {
+      transform: translateY(35px) rotate(45deg);
+    }
+  }

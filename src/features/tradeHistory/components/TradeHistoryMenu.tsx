@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import ArrowLeft from "~/components/icons/ArrowIcon";
+import { CsvUploadModal } from "~/components/modals";
 import { useAppStore } from "~/hooks/useAppStore";
 import { api } from "~/utils/api";
 
 import { DateRangeSchema } from "../types";
 import { generateDateRangeUrl } from "../utils";
-import { CsvFileUpload } from "./CsvFileUpload";
 import { DateRangeButton } from "./DateRangeButton";
 import { TradeFilterSelect } from "./TradeFilterSelect";
 
@@ -47,10 +47,25 @@ export const TradeHistoryMenu = () => {
     updateTagType("all");
   };
 
+  const openCsvUploadModal = () => {
+    const modal = document.getElementById(
+      "csv_upload_modal"
+    ) as HTMLDialogElement | null;
+    if (modal) {
+      modal.showModal();
+    }
+  };
+
   return (
     <>
       <div className="mb-5 flex self-end">
-        <CsvFileUpload />
+        <button
+          className="btn btn-primary"
+          onClick={() => openCsvUploadModal()}
+        >
+          Import Trades
+        </button>
+        <CsvUploadModal />
       </div>
       <div className="relative my-9 flex w-full justify-between ">
         <div className="flex space-x-10">

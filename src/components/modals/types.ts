@@ -6,3 +6,11 @@ export interface LineType {
   style: string;
   size: string;
 }
+
+export interface TradeDetails {
+  Symbol: string;
+  TimeStamp: string;
+  Price: number;
+  Profit: number;
+  Volume: number;
+}
