@@ -54,7 +54,7 @@ const transformTopStepData = (tradeData: topStepTradeType) => {
         Name: trade.ContractName,
       };
     } else {
-      combinedEntryTrades[key].Size +=
+      combinedEntryTrades[key]!.Size +=
         trade.Type === "Long" ? trade.Size : -trade.Size;
     }
 
