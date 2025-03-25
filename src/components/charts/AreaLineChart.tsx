@@ -112,11 +112,16 @@ export const AreaLineChart = () => {
   return (
     <section className="relative">
       <div
-        className={`z-10 ml-20 mt-16 h-96 w-[24rem] min-[1920px]:w-[36rem] ${
+        className={`z-10 ml-20 mt-16 h-96 w-[24rem] rounded-lg min-[1920px]:w-[36rem] ${
           isLoading && "opacity-0"
         }`}
-        ref={chartRef}
       >
+        <div className="absolute left-[4.5rem] top-0 z-[-1] h-full w-[80%] rounded-3xl bg-black min-[1920px]:w-[85%]"></div>
+
+        <div
+          className="ml-10 h-full w-[85%] min-[1920px]:w-[90%]"
+          ref={chartRef}
+        ></div>
         <span ref={toolTipRef} className="absolute left-28 top-5 z-20"></span>
       </div>
       {isLoading ? (
