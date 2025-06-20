@@ -7,12 +7,15 @@ With powerful features like interactive trade charts, tagging, rich-text journal
 > 🧑‍💻 Built for personal use, designed with production-quality practices to showcase full-stack development, database architecture, and data visualization capabilities.
 
 >
-> ![App Walkthrough Screenshot](./media/app-walkthrough.gif)
+> ![App Walkthrough Gif](./media/app-walkthrough.gif)
 
 
 ---
 
 ## 🔍 Features
+
+- 🗒**Trade List View**  
+  Display all trades taken, browse and filter trades based on trading sessions.
 
 - 📊 **Visual Trade Analysis**  
   Interactive charts (via Lightweight Charts) to view entries, exits, and market context.
@@ -23,12 +26,9 @@ With powerful features like interactive trade charts, tagging, rich-text journal
 - 📝 **Trade Journaling**  
   Write rich-text notes using TinyMCE to reflect on trade rationale and psychology.
 
-- 🗒**Trade List View**  
-  Display all trades taken, browse and filter trades based on trading sessions.
-
 - 📈 **CSV Import**  
 Supports different broker-exported CSVs. Automatically parses date, symbol, entry/exit, PnL, and more.
- > ![App Walkthrough Screenshot](./media/csv-import-video.gif)
+ > ![Import CSV Gif](./media/csv-import-video.gif)
 
 ---
 
