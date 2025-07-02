@@ -1,8 +1,0 @@
-/* calendar.css */
-.react-calendar {
-  background: black !important;
-}
-.react-calendar__tile--now {
-    background-color: gray !important;
-   
-  }
