@@ -9,6 +9,7 @@ import {
   openPriceLineModal,
 } from "~/features/tradeDetails";
 import { useAppStore } from "~/hooks/useAppStore";
+import { useThemeObserver } from "~/hooks/useThemeObserver";
 import { api } from "~/utils/api";
 
 import {
@@ -19,6 +20,7 @@ import {
 } from "lightweight-charts";
 
 import { TimeFrameModal } from "../modals";
+import { CHART_STYLES } from "./constants";
 import { createChartToolTip, renderChartToolTip } from "./helper";
 
 interface Props {
@@ -30,6 +32,8 @@ export const CandleStickChart = ({ chartMarkers }: Props) => {
   const date = router.query.date as string;
   const hiddenPriceLineIds = useAppStore((state) => state.hiddenPriceLineIds);
   const [timeFrame, setTimeFrame] = useState(1);
+
+  const currentTheme = useThemeObserver();
 
   const { data: details, isLoading } = api.trades.getChartData.useQuery(
     { symbol, date, timeFrame },
@@ -61,8 +65,16 @@ export const CandleStickChart = ({ chartMarkers }: Props) => {
   useEffect(() => {
     const chart = createChart(chartRef.current!, {
       layout: {
-        background: { color: "#161B26" },
-        textColor: "#FFF",
+        background: {
+          color:
+            currentTheme === CHART_STYLES.THEME_FOREST
+              ? CHART_STYLES.CHART_DARK_MODE
+              : CHART_STYLES.LIGHT_MODE,
+        },
+        textColor:
+          currentTheme === CHART_STYLES.THEME_FOREST
+            ? CHART_STYLES.WHITE
+            : CHART_STYLES.DARK_MODE,
       },
       grid: {
         vertLines: { color: "#444" },
@@ -75,7 +87,7 @@ export const CandleStickChart = ({ chartMarkers }: Props) => {
       crosshair: {
         mode: 0,
         horzLine: {
-          labelBackgroundColor: "#FFF",
+          labelBackgroundColor: CHART_STYLES.WHITE,
         },
       },
 
@@ -129,10 +141,15 @@ export const CandleStickChart = ({ chartMarkers }: Props) => {
     chart.subscribeCrosshairMove((param) => {
       const data = param.seriesData.get(candleSeries) as BarData<Time>;
 
+      const selectedTrades =
+        Array.isArray(chartMarkers) && chartMarkers.length > 0
+          ? chartMarkers
+          : dailyTrades;
+
       if (
         param.point === undefined ||
         !param.time ||
-        !dailyTrades?.some((trade) => trade.Marker === data?.time) ||
+        !selectedTrades?.some((trade) => trade.Marker === data?.time) ||
         timeFrame !== 1
       ) {
         toolTip.style.display = "none";

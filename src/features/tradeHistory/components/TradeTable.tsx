@@ -54,9 +54,9 @@ export const TradeTable = ({ trades, handleNextTrades }: Props) => {
       }    overflow-y-scroll`}
       ref={tableRef}
     >
-      <table className="table table-zebra  table-pin-rows table-lg flex  bg-primary-content">
+      <table className="table table-zebra  table-pin-rows table-lg">
         <thead>
-          <tr>
+          <tr className="bg-base-200">
             <th></th>
             <th>Symbol</th>
             <th>Date/Time</th>

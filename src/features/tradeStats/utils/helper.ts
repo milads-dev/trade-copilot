@@ -113,7 +113,10 @@ export const sortTradeTags = (tags: TradeTag[]) =>
     return (typeWeights[a.type] ?? 0) - (typeWeights[b.type] ?? 0);
   });
 
-export const processCalendarTrades = (trades: TradeStats) => {
+export const processCalendarTrades = (
+  trades: TradeStats,
+  currentTheme: string | null
+) => {
   const sortedTrades = trades!.sort(
     (a, b) =>
       new Date(a.openTimeStamp).getTime() - new Date(b.openTimeStamp).getTime()
@@ -129,12 +132,21 @@ export const processCalendarTrades = (trades: TradeStats) => {
       ? new Date(sortedTrades[0]!.openTimeStamp)
       : undefined;
 
-  const highlightColor =
-    totalProfit > 0
-      ? "bg-success-content"
-      : totalProfit < 0
-      ? "bg-error-content"
-      : "";
+  let highlightColor = "";
+
+  if (currentTheme === "forest") {
+    if (totalProfit > 0) {
+      highlightColor = "bg-success-content";
+    } else if (totalProfit < 0) {
+      highlightColor = "bg-error-content";
+    }
+  } else {
+    if (totalProfit > 0) {
+      highlightColor = "bg-success";
+    } else if (totalProfit < 0) {
+      highlightColor = "bg-error";
+    }
+  }
 
   return {
     highlightColor,

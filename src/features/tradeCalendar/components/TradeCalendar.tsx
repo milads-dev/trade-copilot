@@ -7,6 +7,7 @@ import {
   processCalendarTrades,
 } from "~/features/tradeStats";
 import { useAppStore } from "~/hooks/useAppStore";
+import { useThemeObserver } from "~/hooks/useThemeObserver";
 import { api } from "~/utils/api";
 
 import { add, format, getDate, getMonth, sub } from "date-fns";
@@ -17,6 +18,7 @@ import { Cell } from "./Cell";
 
 export const TradeCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const currentTheme = useThemeObserver();
 
   const { calendarStart, calendarEnd, numDays, prefixDays, suffixDays } =
     calculateCalendarRange(currentDate);
@@ -50,7 +52,7 @@ export const TradeCalendar = () => {
   return (
     <div className="mt-7 w-[70rem] self-end border-l border-t bg-base-200">
       <div className="grid grid-cols-7 items-center justify-center text-center ">
-        <div className="col-span-7 flex select-none items-center justify-between border-b border-r p-3 text-white">
+        <div className="col-span-7 flex select-none items-center justify-between border-b border-r bg-base-300 p-3">
           <span
             className="cursor-pointer hover:animate-pulse"
             onClick={() => prevMonth()}
@@ -82,8 +84,10 @@ export const TradeCalendar = () => {
               );
 
               if (dailyTrades.length > 0) {
-                const { highlightColor, date, profit } =
-                  processCalendarTrades(dailyTrades);
+                const { highlightColor, date, profit } = processCalendarTrades(
+                  dailyTrades,
+                  currentTheme
+                );
                 const tradeTags = getTradeTags(tags, selectedTagType, date);
 
                 return (

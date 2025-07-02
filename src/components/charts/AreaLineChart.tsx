@@ -3,9 +3,12 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 
 import { calculateAreaChartLine } from "~/features/tradeStats";
+import { useThemeObserver } from "~/hooks/useThemeObserver";
 import { api } from "~/utils/api";
 
 import { createChart } from "lightweight-charts";
+
+import { CHART_STYLES } from "./constants";
 
 export const AreaLineChart = () => {
   const router = useRouter();
@@ -14,6 +17,8 @@ export const AreaLineChart = () => {
 
   const chartRef = useRef<HTMLDivElement>(null);
   const toolTipRef = useRef<HTMLSpanElement | null>(null);
+
+  const currentTheme = useThemeObserver();
 
   const { data, isLoading } = api.trades.getStats.useQuery(
     { startDate, endDate },
@@ -27,8 +32,16 @@ export const AreaLineChart = () => {
   useEffect(() => {
     const chart = createChart(chartRef.current!, {
       layout: {
-        background: { color: "##030202" },
-        textColor: "#FFF",
+        background: {
+          color:
+            currentTheme === CHART_STYLES.THEME_FOREST
+              ? CHART_STYLES.DARK_MODE
+              : CHART_STYLES.LIGHT_MODE,
+        },
+        textColor:
+          currentTheme === CHART_STYLES.THEME_FOREST
+            ? CHART_STYLES.WHITE
+            : CHART_STYLES.DARK_MODE,
       },
       grid: {
         vertLines: { color: "#444" },
@@ -42,7 +55,7 @@ export const AreaLineChart = () => {
       crosshair: {
         mode: 0,
         horzLine: {
-          labelBackgroundColor: "#FFF",
+          labelBackgroundColor: CHART_STYLES.LIGHT_MODE,
         },
       },
     });
@@ -107,7 +120,7 @@ export const AreaLineChart = () => {
     return () => {
       chart.remove();
     };
-  }, [areaData]);
+  }, [areaData, currentTheme]);
 
   return (
     <section className="relative">
@@ -116,7 +129,13 @@ export const AreaLineChart = () => {
           isLoading && "opacity-0"
         }`}
       >
-        <div className="absolute left-[4.5rem] top-0 z-[-1] h-full w-[80%] rounded-3xl bg-black min-[1920px]:w-[85%]"></div>
+        <div
+          className={`absolute left-[4.5rem] top-0 z-[-1] h-full w-[80%] rounded-3xl  min-[1920px]:w-[85%] ${
+            currentTheme === CHART_STYLES.THEME_FOREST
+              ? `bg-[${CHART_STYLES.DARK_MODE}]`
+              : `bg-[${CHART_STYLES.LIGHT_MODE}]`
+          }`}
+        ></div>
 
         <div
           className="ml-10 h-full w-[85%] min-[1920px]:w-[90%]"
