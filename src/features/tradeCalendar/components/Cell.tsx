@@ -26,7 +26,7 @@ export const Cell: React.FC<Props> = ({
           ? () => router.push(generateDateRangeUrl("/trades", date))
           : undefined
       }
-      className={`flex h-32 select-none items-start justify-start border-b border-r p-3 text-white transition-colors 
+      className={`flex h-32 select-none items-start justify-start border-b border-r p-3 text-base-content transition-colors 
         ${isDisabled ? "" : "cursor-pointer hover:bg-secondary-content"}
         ${highlightColor}`}
     >
