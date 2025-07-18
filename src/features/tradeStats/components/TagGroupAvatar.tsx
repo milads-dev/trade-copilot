@@ -21,28 +21,27 @@ export const TagGroupAvatar = ({ tradeTags }: { tradeTags: Tags }) => {
 
   const visibleTags = tradeTags?.slice(0, 3);
 
+  if (!visibleTags || visibleTags.length === 0) return null;
+
   return (
-    visibleTags &&
-    visibleTags.length > 0 && (
-      <div
-        className={`tooltip tooltip-bottom absolute mt-16 hidden lg:block ${
-          isTagIdSelected && "animate-bounce"
-        } `}
-        data-tip={tradeTags?.map((tag, index) => ` ${index + 1}.${tag.name}`)}
-      >
-        <div className="avatar-group w-16 -space-x-6">
-          {visibleTags.map((_, index) => (
-            <div key={index} className={`avatar ${tradeTagColor}`}>
-              <div className="w-12"></div>
-            </div>
-          ))}
-          <div className="avatar placeholder">
-            <div className="w-12 bg-base-100">
-              <span>{tradeTags?.length}</span>
-            </div>
+    <div
+      className={`tooltip tooltip-bottom absolute mt-16 hidden lg:block ${
+        isTagIdSelected && "animate-bounce"
+      } `}
+      data-tip={tradeTags?.map((tag, index) => ` ${index + 1}.${tag.name}`)}
+    >
+      <div className="avatar-group w-16 -space-x-6">
+        {visibleTags.map((_, index) => (
+          <div key={index} className={`avatar ${tradeTagColor}`}>
+            <div className="w-12"></div>
+          </div>
+        ))}
+        <div className="avatar placeholder">
+          <div className="w-12 bg-base-100">
+            <span>{tradeTags?.length}</span>
           </div>
         </div>
       </div>
-    )
+    </div>
   );
 };

@@ -9,12 +9,13 @@ import CreatableSelect from "react-select/creatable";
 import { useRouter } from "next/router";
 
 import {
-  CLEAR_TAGS,
+  META_ACTIONS,
   type OptionType,
-  REMOVE_TAG,
-  SELECT_TAG,
+  TAG_MENU_STYLES,
+  THEME_FOREST,
   type TagDetail,
 } from "~/features/tradeDetails";
+import { useThemeObserver } from "~/hooks/useThemeObserver";
 import { api } from "~/utils/api";
 
 import { DeleteTagIcon } from "./DeleteTagIcon";
@@ -33,6 +34,7 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
   };
   const router = useRouter();
   const ctx = api.useContext();
+  const currentTheme = useThemeObserver();
 
   const symbol = router.query.symbol as string;
   const date = router.query.date as string;
@@ -56,14 +58,14 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
     _newValue: MultiValue<OptionType>,
     actionMeta: ActionMeta<OptionType>
   ) => {
-    if (actionMeta.action === REMOVE_TAG) {
-      removeTag.mutate({ id: actionMeta.removedValue.id });
+    if (actionMeta.action === META_ACTIONS.REMOVE) {
+      removeTag.mutate({ id: actionMeta.removedValue?.id });
     }
-    if (actionMeta.action === SELECT_TAG) {
+    if (actionMeta.action === META_ACTIONS.SELECT) {
       addTagToTradeMutation.mutate({ symbol, date, id: actionMeta.option!.id });
     }
-    if (actionMeta.action === CLEAR_TAGS) {
-      const tagArray = actionMeta.removedValues.map((tag) => tag.id);
+    if (actionMeta.action === META_ACTIONS.CLEAR) {
+      const tagArray = actionMeta.removedValues?.map((tag) => tag.id);
       removeTag.mutate({ tagArray });
     }
   };
@@ -76,22 +78,28 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
       ...baseStyles,
       backgroundColor: "transparent",
       borderColor: tagColors[tagType],
-      color: "white",
+      color: TAG_MENU_STYLES.WHITE,
       ":hover": {
         borderColor: tagColors[tagType],
       },
     }),
     menu: (baseStyles: CSSObjectWithLabel) => ({
       ...baseStyles,
-      backgroundColor: "black",
-      borderColor: "white",
+      backgroundColor:
+        currentTheme === THEME_FOREST
+          ? TAG_MENU_STYLES.DARK_MODE
+          : TAG_MENU_STYLES.LIGHT_MODE,
+      borderColor: TAG_MENU_STYLES.WHITE,
       borderWidth: 1,
     }),
     option: (baseStyles: CSSObjectWithLabel) => ({
       ...baseStyles,
-      backgroundColor: "transparent",
+      backgroundColor:
+        currentTheme === THEME_FOREST
+          ? "transparent"
+          : TAG_MENU_STYLES.LIGHT_MODE,
       ":hover": {
-        backgroundColor: "gray",
+        backgroundColor: currentTheme === THEME_FOREST ? "gray" : "#e2e0e0",
       },
     }),
     multiValue: (baseStyles: CSSObjectWithLabel) => ({
@@ -100,11 +108,14 @@ export const TagSelect = ({ value, options, tagType }: Props) => {
     }),
     multiValueLabel: (baseStyles: CSSObjectWithLabel) => ({
       ...baseStyles,
-      color: "white",
+      color: TAG_MENU_STYLES.WHITE,
     }),
     input: (baseStyles: CSSObjectWithLabel) => ({
       ...baseStyles,
-      color: "white",
+      color:
+        currentTheme === THEME_FOREST
+          ? TAG_MENU_STYLES.LIGHT_MODE
+          : TAG_MENU_STYLES.DARK_MODE,
     }),
   };
   return (

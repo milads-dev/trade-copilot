@@ -1,28 +1,70 @@
-# Create T3 App
+# 📈 Trade Copilot
+
+**Trade Copilot** is a full-stack trade tracking application built to help traders import, journal, and analyze their trades with ease. At its core, the app allows users to **import trade data from CSV files**, transforming traditional pen-and-paper journaling into a modern, searchable, and interactive experience.
+
+With powerful features like interactive trade charts, tagging, rich-text journaling, and performance analytics, Trade Copilot offers a complete post-trade review workflow.
+
+> 🧑‍💻 Built for personal use, designed with production-quality practices to showcase full-stack development, database architecture, and data visualization capabilities.
+
+>
+> ![App Walkthrough Gif](./media/app-walkthrough.gif)
+
+
+---
+
+## 🔍 Features
+
+- 🗒**Trade List View**  
+  Display all trades taken, browse and filter trades based on trading sessions.
+
+- 📊 **Visual Trade Analysis**  
+  Interactive charts (via Lightweight Charts) to view entries, exits, and market context.
+
+- 🏷️ **Tagging System**  
+  Categorize trades by strategy, emotion, or market condition for filtering and pattern recognition.
+
+- 📝 **Trade Journaling**  
+  Write rich-text notes using TinyMCE to reflect on trade rationale and psychology.
+
+- 📈 **CSV Import**  
+Supports different broker-exported CSVs. Automatically parses date, symbol, entry/exit, PnL, and more.
+ > ![Import CSV Gif](./media/csv-import-video.gif)
+
+---
+
+## Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## What's next? How do I make an app with this?
+## ⚙️ Tech Stack
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+| Layer        | Technology                         |
+|--------------|-------------------------------------|
+| Frontend     | React 18 + Next.js 13               |
+| Styling      | Tailwind CSS + DaisyUI + Framer     |
+| State Mgmt   | Zustand + React Query               |
+| Forms        | React Hook Form + Zod               |
+| Backend      | tRPC + Prisma                       |
+| Database     | Supabase (Postgres)                 |
+| Auth         | NextAuth.js (Supabase Adapter)      |
+| Charts       | Lightweight Charts                  |
+| Deployment   | Vercel                              |
+| Tooling      | Prettier, ESLint, TypeScript        |
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+---
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## 🚀 Live Demo
 
-## Learn More
+🔗 [**View Deployed App**](https://your-vercel-url.vercel.app)  
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+---
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## 🛠️ Getting Started
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+Clone and run locally:
 
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```bash
+git clone https://github.com/yourusername/trade-copilot.git
+cd trade-copilot
+pnpm install
+pnpm dev
