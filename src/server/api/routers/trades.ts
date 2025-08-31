@@ -16,8 +16,11 @@ import {
 } from "~/features/tradeHistory";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
+import { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
+import { Time } from "lightweight-charts";
+import moment from "moment";
 import { z } from "zod";
 
 export const tradesRouter = createTRPCRouter({
@@ -312,5 +315,306 @@ export const tradesRouter = createTRPCRouter({
         console.error("Error", error);
         return {};
       }
+    }),
+
+  getRecentTradeDays: protectedProcedure.query(async ({ ctx }) => {
+    const allTimestamps = await ctx.prisma.tradeHistory.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      select: {
+        TimeStamp: true,
+      },
+      orderBy: {
+        TimeStamp: "desc",
+      },
+    });
+
+    const uniqueDates = Array.from(
+      new Set(
+        allTimestamps.map(
+          (t) => t.TimeStamp.toISOString().split("T")[0] // Extract date only
+        )
+      )
+    ).slice(0, 5);
+
+    return uniqueDates;
+  }),
+
+  getRecentTradeCharts: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const recentTrades = await ctx.prisma.tradeHistory.findMany({
+      where: { userId: userId },
+      orderBy: { TimeStamp: "desc" },
+      take: 300, // buffer in case trades happened multiple times a day
+    });
+
+    // Group by day+symbol, pick 5 most recent trading days
+    const uniqueByDate = new Map<string, { date: string; symbol: string }>();
+
+    for (const trade of recentTrades) {
+      const date = trade.TimeStamp.toISOString().split("T")[0] as string;
+
+      const key = `${date}-${trade.Symbol}`;
+      if (!uniqueByDate.has(key) && uniqueByDate.size < 3) {
+        uniqueByDate.set(key, { date, symbol: trade.Symbol });
+      }
+    }
+    const chartResponses: {
+      date: string;
+      symbol: string;
+      data: { time: Time; value: number }[];
+    }[] = [];
+
+    for (const { date, symbol } of uniqueByDate.values()) {
+      const response = await fetch(
+        `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=15min&symbol=qqq&dp=2&start_date=${date} 09:30:00&end_date=${date} 16:00:00`
+      );
+
+      const raw = await response.json();
+      const parsed = candleStickSchema.parse(raw);
+
+      const chartData = parsed.values.reverse().map(({ datetime, close }) => ({
+        time: Math.floor(new Date(datetime).getTime() / 1000) as Time,
+        value: parseFloat(close),
+      }));
+
+      chartResponses.push({ date, data: chartData, symbol });
+    }
+
+    return chartResponses;
+  }),
+  getCarouselTrades: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.string().optional(), // format: '2025-07-07-MNQU5'
+        limit: z.number().min(1).max(10).default(3),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const recentTrades = await ctx.prisma.tradeHistory.findMany({
+        where: { userId },
+        orderBy: { TimeStamp: "desc" },
+        take: 500,
+      });
+
+      // Create map of unique day-symbol keys
+      const uniqueByDate = new Map<string, { date: string; symbol: string }>();
+      for (const trade of recentTrades) {
+        const date = trade.TimeStamp.toISOString().split("T")[0] as string;
+        const key = `${date}-${trade.Symbol}`;
+        if (!uniqueByDate.has(key)) {
+          uniqueByDate.set(key, { date, symbol: trade.Symbol });
+        }
+      }
+
+      const allKeys = Array.from(uniqueByDate.keys()).sort((a, b) => {
+        const [dateA] = a.split("-");
+        const [dateB] = b.split("-");
+        return dateB!.localeCompare(dateA!);
+      });
+
+      const startIndex = input.cursor
+        ? allKeys.findIndex((k) => k === input.cursor) + 1
+        : 0;
+      const paginatedKeys = allKeys.slice(startIndex, startIndex + input.limit);
+
+      const chartResponses: {
+        date: string;
+        symbol: string;
+        data: { time: Time; value: number }[];
+      }[] = [];
+
+      for (const key of paginatedKeys) {
+        const { date, symbol } = uniqueByDate.get(key)!;
+        const response = await fetch(
+          `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=15min&symbol=${symbol}&dp=2&start_date=${date} 09:30:00&end_date=${date} 16:00:00`
+        );
+
+        const raw = await response.json();
+        const parsed = candleStickSchema.parse(raw);
+
+        const chartData = parsed.values
+          .reverse()
+          .map(({ datetime, close }) => ({
+            time: Math.floor(new Date(datetime).getTime() / 1000) as Time,
+            value: parseFloat(close),
+          }));
+
+        chartResponses.push({ date, data: chartData, symbol });
+      }
+
+      const nextCursor =
+        startIndex + input.limit < allKeys.length
+          ? allKeys[startIndex + input.limit - 1]
+          : null;
+
+      return {
+        charts: chartResponses,
+        nextCursor,
+      };
+    }),
+  getInfiniteChartData: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const trades = await ctx.prisma.$queryRaw<
+      {
+        id: number;
+        TimeStamp: Date;
+        Symbol: string;
+        Volume: number;
+        Price: number;
+        Profit: number;
+        tradeDetailsId: number | null;
+      }[]
+    >`
+      SELECT DISTINCT ON ("Symbol", DATE("TimeStamp")) *
+      FROM "TradeHistory"
+      WHERE "userId" = ${userId}
+      ORDER BY DATE("TimeStamp") DESC, "Symbol", "TimeStamp" DESC
+      LIMIT 1;
+    `;
+    const results = await Promise.all(
+      trades.map(async ({ Symbol, TimeStamp }) => {
+        const dateStr = moment(TimeStamp).format("YYYY-MM-DD");
+
+        const start = `${dateStr} 09:30:00`;
+        const end = `${dateStr} 16:00:00`;
+
+        const response = await fetch(
+          `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=15min&symbol=QQQ&dp=2&start_date=${start}&end_date=${end}`
+        );
+        const json = await response.json();
+        console.log("json", json);
+        return {
+          symbol: Symbol,
+          date: dateStr,
+          candlesticks: json?.values ?? [],
+        };
+      })
+    );
+
+    return results;
+  }),
+  getInfiniteChartData1: protectedProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            cursorTimestamp: z.string(),
+            cursorSymbol: z.string(),
+          })
+          .optional(),
+        limit: z.number().min(1).max(50).default(1),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { cursor, limit } = input;
+      const userId = ctx.session.user.id;
+
+      const cursorConditionGroupedProfits = cursor
+        ? Prisma.sql`AND (DATE("TimeStamp") < DATE(${cursor.cursorTimestamp}) OR (DATE("TimeStamp") = DATE(${cursor.cursorTimestamp}) AND "Symbol" > ${cursor.cursorSymbol}))`
+        : Prisma.empty;
+
+      const cursorConditionTradesWithProfit = cursor
+        ? Prisma.sql`AND (DATE(t."TimeStamp") < DATE(${cursor.cursorTimestamp}) OR (DATE(t."TimeStamp") = DATE(${cursor.cursorTimestamp}) AND t."Symbol" > ${cursor.cursorSymbol}))`
+        : Prisma.empty;
+
+      const query = Prisma.sql`
+  WITH grouped_profits AS (
+    SELECT
+      "Symbol",
+      DATE("TimeStamp") AS trade_date,
+      SUM("Profit") AS total_profit
+    FROM "TradeHistory"
+    WHERE "userId" = ${userId}
+    ${cursorConditionGroupedProfits}
+    GROUP BY "Symbol", trade_date
+  ),
+  trades_with_profit AS (
+    SELECT DISTINCT ON (t."Symbol", DATE(t."TimeStamp"))
+      t.*,
+      gp.total_profit
+    FROM "TradeHistory" t
+    JOIN grouped_profits gp
+      ON gp."Symbol" = t."Symbol"
+     AND gp.trade_date = DATE(t."TimeStamp")
+    WHERE t."userId" = ${userId}
+    ${cursorConditionTradesWithProfit}
+    ORDER BY DATE(t."TimeStamp") DESC, t."Symbol", t."TimeStamp" DESC
+    LIMIT ${limit}
+  )
+  SELECT * FROM trades_with_profit;
+`;
+
+      const trades = await ctx.prisma.$queryRaw<
+        {
+          id: number;
+          TimeStamp: Date;
+          Symbol: string;
+          Volume: number;
+          Price: number;
+          Profit: number;
+          tradeDetailsId: number | null;
+          total_profit: number;
+        }[]
+      >(query);
+
+      const results = await Promise.all(
+        trades.map(async ({ Symbol, TimeStamp, total_profit }) => {
+          const dateStr = moment(TimeStamp).format("YYYY-MM-DD");
+          const start = `${dateStr} 09:30:00`;
+          const end = `${dateStr} 16:00:00`;
+
+          try {
+            const response = await fetch(
+              `https://api.twelvedata.com/time_series?apikey=${process.env.NEXT_PUBLIC_TWELVEDATA_API_KEY}&interval=15min&symbol=QQQ&dp=2&start_date=${start}&end_date=${end}`
+            );
+            const json = await response.json();
+
+            const parsed = candleStickSchema.parse(json);
+            const chartData = (parsed?.values ?? [])
+              .map((c) => ({
+                time: Math.floor(new Date(c.datetime).getTime() / 1000),
+                value: parseFloat(c.close),
+              }))
+              .sort((a, b) => a.time - b.time) as {
+              time: Time;
+              value: number;
+            }[];
+
+            return {
+              symbol: Symbol,
+              date: dateStr,
+              totalProfit: total_profit,
+              chartData,
+            };
+          } catch (error) {
+            return {
+              symbol: Symbol,
+              date: dateStr,
+              totalProfit: 0,
+              error: "fetch_failed",
+              chartData: [],
+            };
+          }
+        })
+      );
+
+      const last = trades[trades.length - 1];
+      const nextCursor = last
+        ? {
+            cursorTimestamp: last.TimeStamp.toISOString(),
+            cursorSymbol: last.Symbol,
+          }
+        : null;
+
+      return {
+        data: results,
+        nextCursor,
+      };
     }),
 });

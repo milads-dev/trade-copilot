@@ -22,6 +22,7 @@ export const TradePnlStats = () => {
   const result = calculateTradeStats(tradeStats);
 
   return (
+    // <div className="stats stats-vertical mx-5 mb-32 h-full w-full bg-base-200 md:stats-horizontal">
     <div className="stats stats-vertical w-[35rem] self-end bg-base-200 md:stats-horizontal  md:w-[70rem]">
       <div className="stat">
         <div

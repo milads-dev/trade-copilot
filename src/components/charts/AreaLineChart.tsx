@@ -132,8 +132,8 @@ export const AreaLineChart = () => {
         <div
           className={`absolute left-[4.5rem] top-0 z-[-1] h-full w-[80%] rounded-3xl  min-[1920px]:w-[85%] ${
             currentTheme === CHART_STYLES.THEME_FOREST
-              ? `bg-[${CHART_STYLES.DARK_MODE}]`
-              : `bg-[${CHART_STYLES.LIGHT_MODE}]`
+              ? `bg-[black]`
+              : `bg-[#EDEDED]`
           }`}
         ></div>
 

@@ -62,6 +62,8 @@ export const CandleStickChart = ({ chartMarkers }: Props) => {
   const { dailyTrades } = data ?? {};
   const chartRef = useRef<HTMLDivElement>(null);
 
+  console.log("details", details);
+
   useEffect(() => {
     const chart = createChart(chartRef.current!, {
       layout: {

@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { Drawer } from "~/components/auth/Drawer";
+import CsvLoader from "~/components/modals/CsvUpload/CsvLoader";
 import { TradeHistoryMenu, TradeTable } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
 
@@ -31,6 +32,10 @@ const Trades = () => {
   };
 
   const trades = data?.pages.flatMap((page) => page?.trades ?? []);
+  const profitOrLoss = trades?.reduce(
+    (accum, currentTrade) => accum + currentTrade.Profit,
+    0
+  );
 
   return (
     <>
@@ -49,7 +54,6 @@ const Trades = () => {
                 <Image
                   src="/assets/searchingClouds.svg"
                   alt="Searching"
-                  layout="fixed"
                   width={400}
                   height={100}
                 />
@@ -65,13 +69,34 @@ const Trades = () => {
                 <Image
                   src="/assets/not-found.svg"
                   alt="No Data"
-                  layout="fixed"
                   width={400}
                   height={100}
                 />
                 <span>No Trades Found</span>
               </div>
             )}
+            <div className="w=full text-center">
+              <div className="stats mt-5 bg-primary-content">
+                <div className="stat">
+                  <div className="stat-title">
+                    Total {profitOrLoss && profitOrLoss > 0 ? "Profit" : "Loss"}
+                  </div>
+                  <div className="stat-value">
+                    {profitOrLoss &&
+                      (profitOrLoss > 0 ? (
+                        <div className="text-primary">
+                          ${Math.abs(profitOrLoss).toFixed(2)}
+                        </div>
+                      ) : (
+                        <div className="text-error">
+                          $({Math.abs(profitOrLoss).toFixed(2)})
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <CsvLoader />
           </div>
         </div>
       </Drawer>
