@@ -7,7 +7,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { Drawer } from "~/components/auth/Drawer";
+import { Drawer } from "~/components/Drawer";
 import { TradeHistoryMenu, TradeTable } from "~/features/tradeHistory";
 import { api } from "~/utils/api";
 

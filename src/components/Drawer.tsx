@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
-import { DrawerIcon } from "../icons/DrawerIcon";
-import { ThemeController } from "../ui/ThemeController";
+import { DrawerIcon } from "./icons/DrawerIcon";
+import { ThemeController } from "./ui/ThemeController";
 
 interface Props {
   children: ReactNode;
