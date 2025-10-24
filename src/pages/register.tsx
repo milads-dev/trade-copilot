@@ -48,8 +48,6 @@ const Register = () => {
     });
   }
 
-  console.log("mutation", mutation.isLoading);
-
   return (
     <AuthLayout>
       <Head>
