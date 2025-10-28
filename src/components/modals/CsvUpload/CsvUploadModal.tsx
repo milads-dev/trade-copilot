@@ -11,9 +11,10 @@ import TradePlatformSelector from "./TradePlatformSelector";
 
 export const CsvUploadModal = () => {
   const [slideDirection, setDirection] = useState(1);
+  const [tradeData, setTradeData] = useState<TradeDetails[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const ctx = api.useContext();
-  const [currentStep, setCurrentStep] = useState(0);
   const mutation = api.trades.addTrades.useMutation({
     onSuccess: () => ctx.trades.invalidate(),
   });
@@ -49,8 +50,6 @@ export const CsvUploadModal = () => {
     setTradePlatform("");
     setTradeData([]);
   };
-
-  const [tradeData, setTradeData] = useState<TradeDetails[]>([]);
 
   return (
     <motion.dialog id="csv_upload_modal" className="modal">

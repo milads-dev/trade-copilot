@@ -1,18 +1,18 @@
 import React from "react";
 import { useCSVReader } from "react-papaparse";
 
+import {
+  topStepArrayCsvSchema,
+  unionArrayCsvSchema,
+} from "~/features/tradeHistory/types";
+import {
+  getValidCsvData,
+  transformCsvData,
+} from "~/features/tradeHistory/utils";
 import { api } from "~/utils/api";
 
 import { type z } from "zod";
 
-import {
-  topStepArrayCsvSchema,
-  unionArrayCsvSchema,
-} from "../../../features/tradeHistory/types";
-import {
-  getValidCsvData,
-  transformCsvData,
-} from "../../../features/tradeHistory/utils";
 import { type TradeDetails } from "../types";
 
 interface CsvObject {

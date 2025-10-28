@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import type * as AuthModule from "~/components/auth";
 import { handleSignIn } from "~/components/auth";
 import Login from "~/pages/login";
