@@ -1,17 +1,8 @@
 import React from "react";
 import { useCSVReader } from "react-papaparse";
 
-import {
-  topStepArrayCsvSchema,
-  unionArrayCsvSchema,
-} from "~/features/tradeHistory/types";
-import {
-  getValidCsvData,
-  transformCsvData,
-} from "~/features/tradeHistory/utils";
+import { handleOnDrop } from "~/features/tradeHistory/utils";
 import { api } from "~/utils/api";
-
-import { type z } from "zod";
 
 import { type TradeDetails } from "../types";
 
@@ -26,11 +17,6 @@ type ParentProps = {
   tradeSchema: string;
 };
 
-const schemaMap: Record<string, z.Schema> = {
-  topStep: topStepArrayCsvSchema,
-  metaTrader: unionArrayCsvSchema,
-  ibkr: unionArrayCsvSchema,
-};
 export const CsvFileUpload: React.FC<ParentProps> = ({
   tradeSchema,
   setTradeData,
@@ -43,30 +29,6 @@ export const CsvFileUpload: React.FC<ParentProps> = ({
     onSuccess: () => ctx.trades.invalidate(),
   });
 
-  const handleOnDrop = (input: CsvObject, tradeSchema: string) => {
-    const { data } = input;
-    const selectedSchema = schemaMap[tradeSchema];
-
-    if (selectedSchema) {
-      const result = selectedSchema.safeParse(
-        getValidCsvData(data, tradeSchema)
-      );
-
-      if (result.success) {
-        const transformTradeData = transformCsvData(
-          result.data as unknown[],
-          tradeSchema
-        );
-
-        if (transformTradeData !== null && transformTradeData.length > 0)
-          setTradeData(transformTradeData);
-        else {
-          alert("Wrong Trade Format");
-        }
-      }
-    }
-  };
-
   return (
     <CSVReader
       config={{
@@ -74,7 +36,7 @@ export const CsvFileUpload: React.FC<ParentProps> = ({
         dynamicTyping: true,
       }}
       onUploadAccepted={(result: CsvObject) =>
-        handleOnDrop(result, tradeSchema)
+        handleOnDrop(result, tradeSchema, setTradeData)
       }
     >
       {({
