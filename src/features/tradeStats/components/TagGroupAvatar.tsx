@@ -25,10 +25,12 @@ export const TagGroupAvatar = ({ tradeTags }: { tradeTags: Tags }) => {
 
   return (
     <div
-      className={`tooltip tooltip-bottom absolute mt-16 hidden lg:block ${
+      className={`tooltip tooltip-bottom absolute mt-16 hidden before:whitespace-pre-line before:text-left lg:block ${
         isTagIdSelected && "animate-bounce"
       } `}
-      data-tip={tradeTags?.map((tag, index) => ` ${index + 1}.${tag.name}`)}
+      data-tip={tradeTags
+        ?.map((tag, index) => `${index + 1}.${tag.name}`)
+        .join("\n")}
     >
       <div className="avatar-group w-16 -space-x-6">
         {visibleTags.map((_, index) => (

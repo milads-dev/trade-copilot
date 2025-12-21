@@ -16,17 +16,32 @@ const mockTrades: TradeDetails[] = [
 jest.mock("../CsvFileUpload.tsx", () => ({
   CsvFileUpload: () => <div data-testid="mock-upload">Mock Upload</div>,
 }));
-test("renders trade rows when tradeData is provided", () => {
-  render(
-    <CsvTradeTable
-      direction={1}
-      tradeData={mockTrades}
-      tradePlatform="topStep"
-      setTradeData={jest.fn()}
-    />
-  );
 
-  expect(screen.getByText(/MNQZ5/)).toBeInTheDocument();
-  expect(screen.getByText(/120/)).toBeInTheDocument();
-  expect(screen.getByTestId("mock-upload")).toBeInTheDocument();
+describe("CsvTradeTable component", () => {
+  it("renders CsvLoader when tradeData is empty", () => {
+    render(
+      <CsvTradeTable
+        direction={1}
+        tradeData={[]}
+        tradePlatform="topStep"
+        setTradeData={jest.fn()}
+      />
+    );
+
+    expect(screen.getByTestId("csv-loader")).toBeInTheDocument();
+  });
+  it("renders trade rows when tradeData is provided", () => {
+    render(
+      <CsvTradeTable
+        direction={1}
+        tradeData={mockTrades}
+        tradePlatform="topStep"
+        setTradeData={jest.fn()}
+      />
+    );
+
+    expect(screen.getByText(/MNQZ5/)).toBeInTheDocument();
+    expect(screen.getByText(/120/)).toBeInTheDocument();
+    expect(screen.getByTestId("mock-upload")).toBeInTheDocument();
+  });
 });
