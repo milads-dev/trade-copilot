@@ -47,8 +47,12 @@ export const CsvFileUpload: React.FC<ParentProps> = ({
       }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any) => (
         <div>
-          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
-          <button className="btn btn-primary w-full" {...getRootProps()}>
+          <button
+            className="btn btn-primary w-full"
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            {...getRootProps()}
+            data-testid="csv-upload-button"
+          >
             <span>Import CSV</span>
             {mutation.isLoading ? (
               <span className="loading loading-dots loading-md"></span>
