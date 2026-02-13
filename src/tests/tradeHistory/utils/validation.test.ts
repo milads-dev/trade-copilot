@@ -1,4 +1,8 @@
-import { getValidCsvData, isMetaTraderCsv } from "../validation";
+// import {
+//   getValidCsvData,
+//   isMetaTraderCsv,
+// } from "features/tradeHistory/utils/validation";
+import { getValidCsvData, isMetaTraderCsv } from "~/features/tradeHistory";
 
 describe("CSV Validation Utilities", () => {
   const mockData = [

@@ -1,7 +1,7 @@
+import { formatUtcTimestamp, transformCsvData } from "~/features/tradeHistory";
+
 import moment from "moment";
 import { ZodError } from "zod";
-
-import { formatUtcTimestamp, transformCsvData } from "../format";
 
 describe("Trade Formatting Utils", () => {
   const mockTrades = [
