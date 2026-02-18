@@ -6,23 +6,10 @@ import { api } from "~/utils/api";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
-jest.mock("next/router", () => ({
-  useRouter: jest.fn(),
-}));
-const mockUseRouter = useRouter as jest.Mock;
-jest.mock("~/utils/api", () => ({
-  api: {
-    tags: {
-      getTagsByFilter: {
-        useQuery: jest.fn(() => ({ tags: [] })),
-      },
-    },
-  },
-}));
-
+jest.mock("~/utils/api");
 describe("TradeFilterSelect", () => {
   test("if no tags are returned,the combobox should not be rendered", () => {
-    mockUseRouter.mockReturnValue({
+    (useRouter as jest.Mock).mockReturnValue({
       pathname: "/trades",
       query: {},
       replace: jest.fn(),
@@ -33,7 +20,7 @@ describe("TradeFilterSelect", () => {
   });
 
   test("combobox should be rendered when tags are returned", () => {
-    mockUseRouter.mockReturnValue({
+    (useRouter as jest.Mock).mockReturnValue({
       pathname: "/trades",
       query: {},
       replace: jest.fn(),

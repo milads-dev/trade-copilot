@@ -4,31 +4,7 @@ import { CsvUploadModal } from "~/components/modals";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("~/utils/api", () => ({
-  api: {
-    trades: {
-      getTrades: {
-        useInfiniteQuery: jest.fn(),
-      },
-      addTrades: {
-        useMutation: jest.fn(() => ({ isLoading: false, mutate: jest.fn() })),
-      },
-    },
-    tags: {
-      getTagsByFilter: {
-        useQuery: jest.fn(),
-      },
-    },
-    useContext: jest.fn(() => ({ trades: { invalidate: jest.fn() } })),
-  },
-}));
-
-jest.mock("next/router", () => ({
-  useRouter: () => ({
-    query: {},
-    replace: jest.fn(),
-  }),
-}));
+jest.mock("~/utils/api.ts");
 
 beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
