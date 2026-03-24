@@ -58,11 +58,12 @@ export const generateMarkers = (
       color: trade.Volume > 0 ? GREEN_MARKER : RED_MARKER,
       shape: "arrowDown" as SeriesMarkerShape,
       text: `${trade.Volume} x ${trade.Price}`,
+      price: trade.Price,
     })) ?? []
   );
 };
 
-const subtractMinutesFromUnixTime = (
+export const subtractMinutesFromUnixTime = (
   unixTime: number,
   minutes: number
 ): number => {

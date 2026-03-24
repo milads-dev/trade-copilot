@@ -4,7 +4,7 @@ import { type OptionProps, components } from "react-select";
 import { api } from "~/utils/api";
 
 export const DeleteTagIcon = (
-  props: OptionProps<{ value: string; label: string; id: number }>
+  props: OptionProps<{ value: string; label: string; id: number; type: string }>
 ) => {
   const deleteTag = api.tags.deleteTag.useMutation();
   const ctx = api.useContext();
@@ -13,7 +13,7 @@ export const DeleteTagIcon = (
     <div className="flex">
       <components.Option {...props}>{props.children}</components.Option>
       <span
-        className="flex w-12 cursor-pointer items-center justify-center hover:bg-red-400 active:bg-red-500"
+        className="flex justify-center items-center hover:bg-red-400 active:bg-red-500 w-12 cursor-pointer"
         onClick={() =>
           deleteTag.mutate(props.data.id, {
             onSuccess: () => void ctx.tags.invalidate(),

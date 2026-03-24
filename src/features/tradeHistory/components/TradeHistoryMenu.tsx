@@ -58,7 +58,7 @@ export const TradeHistoryMenu = () => {
 
   return (
     <>
-      <div className="mb-5 flex self-end">
+      <div className="flex self-end mb-5">
         <button
           className="btn btn-primary"
           onClick={() => openCsvUploadModal()}
@@ -67,9 +67,9 @@ export const TradeHistoryMenu = () => {
         </button>
         <CsvUploadModal />
       </div>
-      <div className="relative my-9 flex w-full justify-between ">
+      <div className="relative flex justify-between my-9 w-full">
         <div className="flex space-x-10">
-          <button className="btn flex w-40" onClick={() => resetTagState()}>
+          <button className="flex w-40 btn" onClick={() => resetTagState()}>
             <Link className="flex items-center space-x-5" href={"/"}>
               <ArrowLeft />
               <span>Back</span>
@@ -78,12 +78,14 @@ export const TradeHistoryMenu = () => {
           {filterTag && (
             <div>
               <span>Filtered By: </span>
-              <button className="btn ml-3">
+              <button className="ml-3 btn">
                 {tagData?.tagName}
                 <svg
                   onClick={() => void handleRemoveFilter()}
-                  className="ml-3 h-3 w-3 text-white hover:opacity-80"
+                  className="hover:opacity-80 ml-3 w-3 h-3 text-white"
                   aria-hidden="true"
+                  aria-label="Remove"
+                  data-testid="remove-tag-button"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 14 14"

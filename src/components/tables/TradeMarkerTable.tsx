@@ -39,7 +39,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
             <th>Price</th>
             <th>Profit</th>
             <th>
-              <div className="dropdown-hover  dropdown dropdown-left">
+              <div className="dropdown dropdown-left dropdown-hover">
                 <div tabIndex={0} role="button">
                   {selectedMarkers === "hidden" ? (
                     <EyeClosedIcon
@@ -103,7 +103,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
               <td>{item.Price}</td>
               <td>{item.Profit}</td>
               <td>
-                <div className=" dropdown-hover  dropdown dropdown-left">
+                <div className="dropdown-left dropdown-hover dropdown">
                   <div tabIndex={index} role="button">
                     <EyeOpenIcon
                       className={`${

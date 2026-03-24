@@ -47,8 +47,8 @@ export const DateRangeButton = ({ passDateChange }: Props) => {
             </span>
             <svg
               onClick={() => handleDateChange([null, null])}
-              className="ml-3 h-3 w-3 "
-              aria-hidden="true"
+              aria-label="Clear date filter"
+              className="ml-3 w-3 h-3"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 14 14"
@@ -66,7 +66,7 @@ export const DateRangeButton = ({ passDateChange }: Props) => {
           <div className="flex items-center" onClick={() => toggleCalendar()}>
             Select Date
             <svg
-              className="ml-3 h-4 w-4"
+              className="ml-3 w-4 h-4"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

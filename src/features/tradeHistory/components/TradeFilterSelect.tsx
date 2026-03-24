@@ -12,13 +12,17 @@ export const TradeFilterSelect = () => {
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const filterId = event.target.value;
-    const isQueryEmpty = Object.keys(router.query).length === 0;
-
-    const newQuery = isQueryEmpty
-      ? `${router.asPath}?filter=${filterId}`
-      : `${router.asPath}&filter=14`;
-
-    void router.replace(newQuery, undefined, { shallow: true });
+    void router.replace(
+      {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          filter: filterId,
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   const renderOptionsByType = (type: string) => {
@@ -34,7 +38,12 @@ export const TradeFilterSelect = () => {
   return (
     <div>
       {data?.tags && data?.tags?.length > 0 && (
-        <select className="select" value="" onChange={handleOptionChange}>
+        <select
+          className="select"
+          value=""
+          onChange={handleOptionChange}
+          aria-label="Filter By"
+        >
           <option value="" disabled>
             Filter By
           </option>

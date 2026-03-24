@@ -3,7 +3,7 @@ import { getSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { Drawer } from "~/components/auth/Drawer";
+import { Drawer } from "~/components/Drawer";
 import { AreaLineChart } from "~/components/charts/AreaLineChart";
 import { TradeCalendar } from "~/features/tradeCalendar";
 import {

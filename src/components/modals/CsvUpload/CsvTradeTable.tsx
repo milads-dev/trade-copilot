@@ -83,7 +83,10 @@ const CsvTradeTable = ({
             </tbody>
           </table>
           {itemsToIterate.length === 0 && (
-            <div className="absolute left-[40%] top-56">
+            <div
+              className="absolute left-[40%] top-56"
+              data-testid="csv-loader"
+            >
               <CsvLoader />
             </div>
           )}
