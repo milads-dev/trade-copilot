@@ -3,6 +3,21 @@ export const api = {
     getTagsByFilter: {
       useQuery: jest.fn(() => ({ data: null, isLoading: false })),
     },
+    removeTag: {
+      useMutation: jest.fn(() => ({
+        mutate: jest.fn(),
+      })),
+    },
+    addTagToTrade: {
+      useMutation: jest.fn(() => ({
+        mutate: jest.fn(),
+      })),
+    },
+    addTag: {
+      useMutation: jest.fn(() => ({
+        mutate: jest.fn(),
+      })),
+    },
   },
   trades: {
     addTrades: {

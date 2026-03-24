@@ -63,7 +63,7 @@ export const generateMarkers = (
   );
 };
 
-const subtractMinutesFromUnixTime = (
+export const subtractMinutesFromUnixTime = (
   unixTime: number,
   minutes: number
 ): number => {

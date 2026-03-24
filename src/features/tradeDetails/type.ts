@@ -45,7 +45,7 @@ export interface TagDetail {
   value: string;
   label: string;
   id: number;
-  type?: string;
+  type: string;
 }
 
 export interface TradeTags {

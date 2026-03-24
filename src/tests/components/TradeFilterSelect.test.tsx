@@ -30,7 +30,7 @@ describe("TradeFilterSelect", () => {
       data: {
         tags: [
           { id: 1, name: "Wrong Lq Target", type: "mistake" },
-          { id: 2, name: "Correct Lq Target", type: "correct" },
+          { id: 2, name: "Correct Lq Target", type: "setup" },
         ],
       },
     });
