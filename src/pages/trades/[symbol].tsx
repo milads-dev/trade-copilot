@@ -7,6 +7,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { CandleStickChart } from "~/components/charts/CandleStickChart";
+import { DailyPnLChart } from "~/components/charts/DailyPnLChart";
 import ArrowLeft from "~/components/icons/ArrowIcon";
 import { TradeMarkerTable } from "~/components/tables/TradeMarkerTable";
 import { DetailsCard, TradeNavigationButtons } from "~/features/tradeDetails";
@@ -44,10 +45,10 @@ const Symbol = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex min-h-screen flex-col space-y-5 p-10">
-        <div className="flex w-full items-center justify-between">
+      <main className="flex flex-col space-y-5 p-10 min-h-screen">
+        <div className="flex justify-between items-center w-full">
           <button
-            className="btn w-40"
+            className="w-40 btn"
             onClick={() => void router.push(tradeHistoryUrl ?? "/trades")}
           >
             <ArrowLeft />
@@ -61,11 +62,11 @@ const Symbol = () => {
         </div>
 
         <div className="z-10">
-          <div className="flex w-full flex-col xl:flex-row xl:space-x-5">
-            <div className="order-2 mt-5 w-[100%] xl:order-1 xl:mt-0 xl:w-[40%]">
+          <div className="flex xl:flex-row flex-col xl:space-x-5 w-full">
+            <div className="order-2 xl:order-1 mt-5 xl:mt-0 w-[100%] xl:w-[40%]">
               <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
             </div>
-            <div className="xl:order2 order-1 w-[100%] xl:w-[60%]">
+            <div className="order-1 w-[100%] xl:w-[60%] xl:order2">
               <CandleStickChart chartMarkers={selectedMarkers} />
             </div>
           </div>
@@ -75,6 +76,7 @@ const Symbol = () => {
           state={state}
           dispatch={dispatch}
         />
+        <DailyPnLChart />
       </main>
     </>
   );
