@@ -147,6 +147,64 @@ export const fetchTradesByFilter = async (
 
   return response;
 };
+export const getRunningPnL = async (
+  ctx: Context,
+  currentDate: string,
+  symbol: string
+) => {
+  const { timeStampStart, timeStampEnd } = getDateRangeTimestamps(
+    currentDate,
+    currentDate
+  );
+
+  const trades = await ctx.prisma.tradeHistory.findMany({
+    where: {
+      userId: ctx.session.user.id,
+      Symbol: symbol,
+      TimeStamp: { gte: timeStampStart, lte: timeStampEnd },
+    },
+    select: {
+      Profit: true,
+      TimeStamp: true,
+    },
+    orderBy: {
+      TimeStamp: "asc",
+    },
+  });
+
+  if (trades.length === 0) {
+    return [
+      {
+        time: Math.floor(new Date(timeStampStart).getTime() / 1000),
+        value: 0,
+      },
+    ];
+  }
+
+  const firstTradeTime = new Date(trades[0]!.TimeStamp).getTime() / 1000;
+
+  let cumulativePnL = 0;
+
+  const chartData = [
+    {
+      time: Math.floor(firstTradeTime) - 60,
+      value: 0,
+    },
+  ];
+
+  for (const trade of trades) {
+    cumulativePnL += trade.Profit;
+
+    if (trade.Profit === 0) continue;
+
+    chartData.push({
+      time: Math.floor(new Date(trade.TimeStamp).getTime() / 1000),
+      value: Number(cumulativePnL.toFixed(2)),
+    });
+  }
+
+  return chartData;
+};
 
 export const fetchTradesByDateRange = async (
   ctx: Context,

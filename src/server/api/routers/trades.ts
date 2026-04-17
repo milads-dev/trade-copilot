@@ -12,6 +12,7 @@ import {
   fetchTradesByDateRange,
   fetchTradesByFilter,
   formatUtcTimestamp,
+  getRunningPnL,
   processDailyTrades,
 } from "~/features/tradeHistory";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -307,6 +308,51 @@ export const tradesRouter = createTRPCRouter({
         return {
           tradeStats: processDailyTrades(formattedTrades),
           areaData: areaDataPnl,
+        };
+      } catch (error) {
+        console.error("Error", error);
+        return {};
+      }
+    }),
+  getDailyPnL: protectedProcedure
+    .input(
+      z.object({
+        currentDate: z.string(),
+        symbol: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { currentDate, symbol } = input;
+
+      const date = new Date(`${currentDate}T00:00:00`);
+
+      const formattedDate = new Intl.DateTimeFormat("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      }).format(date);
+
+      try {
+        let response;
+
+        if (typeof currentDate === "string") {
+          response = await getRunningPnL(ctx, formattedDate, symbol);
+        } else {
+          throw new TRPCError({
+            code: "PARSE_ERROR",
+            message: "Error with Date and/or Symbol",
+          });
+        }
+        console.log("🚀 ~ response:", response);
+        if (!response) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Error Retrieving Trades",
+          });
+        }
+
+        return {
+          pnlData: response,
         };
       } catch (error) {
         console.error("Error", error);
