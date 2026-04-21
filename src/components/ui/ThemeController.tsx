@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 
 export function ThemeController() {
-  const [isDarkMode, setIsDark] = useState(true);
+  const [isDarkMode, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "forest") {
-      document.documentElement.setAttribute("data-theme", "forest");
-      setIsDark(true);
-    } else {
-      document.documentElement.setAttribute("data-theme", "emerald");
-      setIsDark(false);
-    }
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    setIsDark(currentTheme === "forest");
   }, []);
 
   const toggleTheme = () => {
@@ -21,8 +15,11 @@ export function ThemeController() {
     setIsDark(!isDarkMode);
   };
 
+  if (isDarkMode === null)
+    return <div className="p-4 h-[72px]">Loading...</div>;
+
   return (
-    <div className="flex w-full items-center justify-between  p-4">
+    <div className="flex justify-between items-center p-4 w-full">
       <p className="mt-3">{isDarkMode ? "Dark Mode" : "Light Mode"}</p>
       <label className="switch">
         <input
@@ -31,7 +28,6 @@ export function ThemeController() {
           checked={isDarkMode}
           onChange={toggleTheme}
         />
-
         <span className="toggle">
           <span className="left">ON</span>
           <span className="right">OFF</span>
