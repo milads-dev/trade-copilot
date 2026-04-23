@@ -14,30 +14,32 @@ export const Drawer = ({ children }: Props) => {
     <div className="drawer">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
-        {/* Drawer Icon */}
         <label
           htmlFor="my-drawer"
-          className="btn btn-ghost drawer-button tooltip tooltip-secondary tooltip-right absolute left-10 top-12 z-20 flex"
+          className="top-12 tooltip-right left-10 z-20 absolute flex btn btn-ghost drawer-button tooltip tooltip-secondary"
           data-tip="Open Drawer"
         >
           <DrawerIcon />
         </label>
         {/* Page content here */}
-        <div className="z-10 h-[100vh] w-full">{children}</div>
+        <div className="z-10 w-full h-[100vh]">{children}</div>
       </div>
-      <div className="drawer-side z-30">
+      <div className="z-30 drawer-side">
         <label
           htmlFor="my-drawer"
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu min-h-full w-80 space-y-3 bg-base-200 px-4 pt-14 text-base-content">
+        <ul className="space-y-3 bg-base-200 px-4 pt-14 w-80 min-h-full text-base-content menu">
           {/* Sidebar content here */}
           <li>
             <Link href="/">Home</Link>
           </li>
           <li>
             <Link href="/trades">Trade History</Link>
+          </li>
+          <li>
+            <Link href="/market-analysis">Market Analysis</Link>
           </li>
           <li className="flex-grow justify-end">
             <button onClick={() => void signOut()}>Sign Out</button>
