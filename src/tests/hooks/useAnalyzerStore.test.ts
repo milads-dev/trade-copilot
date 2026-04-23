@@ -28,7 +28,7 @@ describe("Market Analyzer Store Tests", () => {
       store.armChart("SHORT", 1, "AWAITING_ENTRY");
       store.completeLeg(200, 1000);
 
-      store.armChart("SHORT", 1, "AWAITING_TRIM");
+      store.armChart("LONG", 1, "AWAITING_TRIM");
       store.completeLeg(150, 2000);
 
       const state = getStore();
