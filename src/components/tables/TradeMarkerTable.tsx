@@ -30,7 +30,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
 
   return (
     <div className="h-64 overflow-scroll">
-      <table className="table table-zebra table-pin-rows">
+      <table className="table table-pin-rows table-zebra">
         <thead className="">
           <tr>
             <th>Symbol</th>
@@ -39,7 +39,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
             <th>Price</th>
             <th>Profit</th>
             <th>
-              <div className="dropdown dropdown-left dropdown-hover">
+              <div className="dropdown-left dropdown-hover dropdown">
                 <div tabIndex={0} role="button">
                   {selectedMarkers === "hidden" ? (
                     <EyeClosedIcon
@@ -54,7 +54,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
                     />
                   )}
                 </div>
-                <ul className="menu dropdown-content rounded-box z-30 -mt-4 mr-1 grid w-52 grid-cols-3 gap-4 bg-base-100 shadow">
+                <ul className="z-30 gap-4 grid grid-cols-3 bg-base-100 shadow -mt-4 mr-1 rounded-box w-52 menu dropdown-content">
                   {Array.from({ length: 6 }, (_, index) => (
                     <li key={index}>
                       <label className="swap">
@@ -83,7 +83,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
                   ))}
                   <li className="col-span-3">
                     <button
-                      className="btn content-center"
+                      className="content-center btn"
                       onClick={() => dispatch({ type: "RESET_STATE" })}
                     >
                       Reset
@@ -120,7 +120,7 @@ export const TradeMarkerTable = ({ trades, state, dispatch }: Props) => {
                   </div>
                   <ul
                     tabIndex={index}
-                    className="menu dropdown-content rounded-box z-30 -mt-4 mr-1 grid w-52 grid-cols-3 gap-4 bg-base-100 shadow"
+                    className="z-30 gap-4 grid grid-cols-3 bg-base-100 shadow -mt-4 mr-1 rounded-box w-52 menu dropdown-content"
                   >
                     {Array.from({ length: 6 }, (_, index) => (
                       <li key={index}>

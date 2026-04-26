@@ -18,22 +18,23 @@ export const TradeLedger = ({ legs }: Props) => {
           <span className="w-1/3 text-right">Price | PnL</span>
         </div>
 
-        {legs.length === 0 ? (
-          <div className="opacity-30 py-10 text-xs text-center italic">
-            No executions recorded yet.
-          </div>
-        ) : (
-          legs.map((leg, index) => (
-            <LedgerRow key={`${leg.time}-${index}`} leg={leg} />
-          ))
-        )}
+        <div className="space-y-4 h-[35rem] overflow-scroll">
+          {legs.length === 0 ? (
+            <div className="opacity-30 py-10 text-xs text-center italic">
+              No executions recorded yet.
+            </div>
+          ) : (
+            legs.map((leg, index) => (
+              <LedgerRow key={`${leg.time}-${index}`} leg={leg} />
+            ))
+          )}
+        </div>
       </div>
     </section>
   );
 };
 
 const LedgerRow = ({ leg }: { leg: TradeLeg }) => {
-  console.log("🚀 ~ LedgerRow ~ leg:", leg);
   const isEntry = leg.label.includes("Entry");
   const isClose = leg.label.includes("Close");
   const isAdd = leg.label.includes("Add");
@@ -46,7 +47,7 @@ const LedgerRow = ({ leg }: { leg: TradeLeg }) => {
 
   return (
     <div
-      className={`flex items-center justify-between rounded-lg border p-3 ${getStyles()}`}
+      className={`flex  items-center justify-between rounded-lg border  p-3 ${getStyles()}`}
     >
       <div className="flex flex-col w-1/3">
         <span className="font-black text-[10px] italic uppercase leading-none">

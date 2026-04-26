@@ -51,10 +51,10 @@ export const MarketTradeController = () => {
         <div className="gap-2 grid grid-cols-2">
           <button
             disabled={runningQty === 0 && tradeLegs.length !== 0}
-            className={`btn btn-success btn-outline btn-sm text-white transition-all focus:outline-none ${
+            className={`btn btn-success  btn-sm text-white transition-all focus:outline-none ${
               mode === "AWAITING_ENTRY" && pendingType === "LONG"
-                ? "animate-pulse"
-                : ""
+                ? "animate-pulse "
+                : "btn-outline"
             }`}
             onClick={() => armChart("LONG", quantity, "AWAITING_ENTRY")}
           >
@@ -62,10 +62,10 @@ export const MarketTradeController = () => {
           </button>
           <button
             disabled={runningQty === 0 && tradeLegs.length !== 0}
-            className={`btn btn-error btn-outline btn-sm text-white transition-all focus:outline-none ${
+            className={`btn btn-error  btn-sm text-white transition-all focus:outline-none ${
               mode === "AWAITING_ENTRY" && pendingType === "SHORT"
                 ? "animate-pulse"
-                : ""
+                : "btn-outline"
             }`}
             onClick={() => armChart("SHORT", quantity, "AWAITING_ENTRY")}
           >
@@ -82,7 +82,8 @@ export const MarketTradeController = () => {
             CANCEL
           </button>
           <button
-            className="btn-outline btn btn-ghost btn-sm"
+            className={`btn btn-ghost btn-outline btn-sm focus:outline-none
+            ${mode === "AWAITING_CLOSE" ? "animate-pulse bg-red-500" : ""}`}
             onClick={() =>
               armChart(
                 runningQty > 0 ? "SHORT" : "LONG",

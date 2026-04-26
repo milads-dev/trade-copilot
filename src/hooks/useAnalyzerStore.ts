@@ -1,4 +1,4 @@
-import { type Mode, type TradeLeg } from "~/features/market-analysis/types";
+import { type Mode, type TradeLeg } from "~/features/marketAnalysis/types";
 
 import { create } from "zustand";
 
