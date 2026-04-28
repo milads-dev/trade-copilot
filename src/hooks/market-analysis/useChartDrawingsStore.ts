@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { type RectangleParams } from "../components/charts/RecanglePrimitive";
+import { type RectangleParams } from "../../components/charts/RecanglePrimitive";
 
 export type DrawingMode = "IDLE" | "DRAW_RECTANGLE";
 

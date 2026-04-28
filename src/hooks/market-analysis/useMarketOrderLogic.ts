@@ -6,7 +6,7 @@ import type {
   MouseEventParams,
 } from "lightweight-charts";
 
-import { useAnalyzerStore } from "../useAnalyzerStore";
+import { useAnalyzerStore } from "./useAnalyzerStore";
 
 export const useMarketOrderLogic = (
   chart: IChartApi | null,

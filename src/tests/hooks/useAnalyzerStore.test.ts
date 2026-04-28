@@ -1,4 +1,4 @@
-import { useAnalyzerStore } from "~/hooks/useAnalyzerStore";
+import { useAnalyzerStore } from "~/hooks/market-analysis/useAnalyzerStore";
 
 describe("Market Analyzer Store Tests", () => {
   const getStore = () => useAnalyzerStore.getState();
