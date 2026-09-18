@@ -87,22 +87,17 @@ export const useChartInit = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only runs once on mount
 
-  const hasInitialFit = useRef(false);
   useEffect(() => {
     if (!seriesRef.current || candleData.length === 0) return;
     if (seriesRef.current && candleData.length > 0) {
       seriesRef.current.setData(candleData);
-      if (!hasInitialFit.current) {
-        requestAnimationFrame(() => {
-          chartRef.current?.timeScale().fitContent();
-          chartRef.current?.timeScale().scrollToPosition(-10, false);
-          chartRef.current?.timeScale().setVisibleLogicalRange({
-            from: -10,
-            to: candleData.length + 10,
-          });
-          hasInitialFit.current = true;
-        });
-      }
+      chartRef.current?.timeScale().fitContent();
+      chartRef.current?.timeScale().scrollToPosition(-10, false);
+
+      chartRef.current?.timeScale().setVisibleLogicalRange({
+        from: -10,
+        to: candleData.length + 10,
+      });
     }
   }, [candleData]);
 

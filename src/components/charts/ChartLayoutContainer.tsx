@@ -13,7 +13,7 @@ export const ChartLayoutContainer = ({
   children,
   isLoading,
   isFullWidth = false,
-  className, // Destructure it
+  className,
 }: ChartLayoutContainerProps) => {
   const widthClass = isFullWidth
     ? "w-full"
@@ -23,17 +23,17 @@ export const ChartLayoutContainer = ({
     <section className="relative">
       <div
         className={cn(
-          "z-10 bg-base-200 mt-16 p-3 rounded-3xl h-96 transition-all duration-300",
+          "z-10 mt-5 h-96 rounded-3xl bg-base-200 p-3 transition-all duration-300",
           widthClass,
           className
         )}
       >
         {isLoading ? (
-          <div className="flex justify-center items-center w-full h-full">
-            <span className="text-success loading loading-infinity loading-lg" />
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="loading loading-infinity loading-lg text-success" />
           </div>
         ) : (
-          <div className="w-full h-full animate-in duration-500 fade-in">
+          <div className="animate-in fade-in h-full w-full duration-500">
             {children}
           </div>
         )}

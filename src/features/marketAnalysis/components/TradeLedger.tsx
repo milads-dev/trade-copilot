@@ -8,19 +8,19 @@ interface Props {
 
 export const TradeLedger = ({ legs }: Props) => {
   return (
-    <section className="flex-1 p-4 border-[2px] border-base-200 border-dashed rounded-xl overflow-y-auto">
+    <section className="flex-1 overflow-y-auto rounded-xl border-[2px] border-dashed border-base-200 p-4">
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center opacity-50 px-2 font-bold text-[10px] uppercase">
+        <div className="flex items-center justify-between px-2 text-[10px] font-bold uppercase opacity-50">
           <span className="w-1/3">Type | Qty</span>
-          <span className="flex justify-center items-center gap-1 w-1/3 text-center">
+          <span className="flex w-1/3 items-center justify-center gap-1 text-center">
             <ClockIcon /> Time
           </span>
           <span className="w-1/3 text-right">Price | PnL</span>
         </div>
 
-        <div className="space-y-4 h-[35rem] overflow-scroll">
+        <div className="h-[35rem] space-y-4 overflow-scroll">
           {legs.length === 0 ? (
-            <div className="opacity-30 py-10 text-xs text-center italic">
+            <div className="py-10 text-center text-xs italic opacity-30">
               No executions recorded yet.
             </div>
           ) : (
@@ -49,23 +49,23 @@ const LedgerRow = ({ leg }: { leg: TradeLeg }) => {
     <div
       className={`flex  items-center justify-between rounded-lg border  p-3 ${getStyles()}`}
     >
-      <div className="flex flex-col w-1/3">
-        <span className="font-black text-[10px] italic uppercase leading-none">
+      <div className="flex w-1/3 flex-col">
+        <span className="text-[10px] font-black uppercase italic leading-none">
           {leg.label}
         </span>
-        <span className="font-mono font-bold text-base-content text-lg leading-tight">
+        <span className="font-mono text-lg font-bold leading-tight text-base-content">
           {leg.qty.toFixed(2)}
         </span>
       </div>
 
-      <div className="flex justify-center items-center w-1/3">
-        <span className="bg-base-300 px-2 py-1 rounded-md font-mono font-semibold text-xs text-base-content">
+      <div className="flex w-1/3 items-center justify-center">
+        <span className="rounded-md bg-base-300 px-2 py-1 font-mono text-xs font-semibold text-base-content">
           {formatTimestamp(leg.time)}
         </span>
       </div>
 
-      <div className="flex flex-col items-end w-1/3">
-        <span className="font-mono font-bold text-sm text-base-content">
+      <div className="flex w-1/3 flex-col items-end">
+        <span className="font-mono text-sm font-bold text-base-content">
           ${leg.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </span>
         {!isEntry && !isAdd && (
@@ -90,7 +90,7 @@ const ClockIcon = () => (
     viewBox="0 0 24 24"
     strokeWidth={2.5}
     stroke="currentColor"
-    className="w-3 h-3"
+    className="h-3 w-3"
   >
     <path
       strokeLinecap="round"
@@ -102,11 +102,12 @@ const ClockIcon = () => (
 
 const formatTimestamp = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
+
   return date.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
-    timeZone: "UTC",
+    timeZone: "America/New_York",
   });
 };

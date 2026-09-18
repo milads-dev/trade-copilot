@@ -1,6 +1,6 @@
 import type { RouterOutputs } from "~/utils/api";
 
-import { type Time } from "lightweight-charts";
+import { type Time, type UTCTimestamp } from "lightweight-charts";
 import { z } from "zod";
 
 export const candleStickSchema = z.object({
@@ -69,3 +69,12 @@ export const priceLineSchema = z.object({
   style: z.string(),
   size: z.string(),
 });
+
+export interface ChartData {
+  time: UTCTimestamp;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
