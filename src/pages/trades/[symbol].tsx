@@ -6,8 +6,8 @@ import { getSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { CandleStickChart } from "~/components/charts/CandleStickChart";
 import { DailyPnLChart } from "~/components/charts/DailyPnLChart";
+import { TradeHistoryChart } from "~/components/charts/TradeHistoryChart";
 import ArrowLeft from "~/components/icons/ArrowIcon";
 import { TradeMarkerTable } from "~/components/tables/TradeMarkerTable";
 import { DetailsCard, TradeNavigationButtons } from "~/features/tradeDetails";
@@ -67,7 +67,7 @@ const Symbol = () => {
               <DetailsCard trades={dailyTrades} isSuccess={isSuccess} />
             </div>
             <div className="order-1 w-[100%] xl:w-[60%] xl:order2">
-              <CandleStickChart chartMarkers={selectedMarkers} />
+              <TradeHistoryChart chartMarkers={selectedMarkers} />
             </div>
           </div>
         </div>
