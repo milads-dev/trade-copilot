@@ -25,12 +25,14 @@ export class RectanglePrimitive implements ISeriesPrimitive<Time> {
 
   constructor(
     rect: RectangleParams,
-    fillColor = "rgba(0, 150, 255, 0.1)",
-    strokeColor = "rgba(2, 158, 255, 0.9)"
+    options?: {
+      fillColor?: string;
+      strokeColor?: string;
+    }
   ) {
     this._rect = rect;
-    this._fillColor = fillColor;
-    this._strokeColor = strokeColor;
+    this._fillColor = options?.fillColor ?? "rgba(0, 150, 255, 0.1)";
+    this._strokeColor = options?.strokeColor ?? "rgba(2, 158, 255, 0.9)";
   }
 
   public attached({
